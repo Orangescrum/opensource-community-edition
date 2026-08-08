@@ -1,0 +1,14 @@
+# Defense in depth: never serve raw data / config / log files, even though they
+# sit under the web root. The rewrite below only routes requests that DON'T map
+# to a real file, so any committed .sql/.ini/.log/etc. would otherwise be served
+# verbatim (see the SaaS-billing SQL that used to live in db_changes/).
+<FilesMatch "\.(sql|ini|log|bak|bkp|old|orig|sh|env|dist|lock|md|yml|yaml)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !\.map$
+    RewriteRule ^ index.php [L]
+</IfModule>

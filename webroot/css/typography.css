@@ -1,0 +1,174 @@
+/*
+ * Application typography — IBM Plex Sans.
+ *
+ * Load this LAST, after every other stylesheet, so it wins the cascade. The
+ * legacy sheets (custom.css, custom_new.css, custom_shadcn_theme.css, ...)
+ * hardcode Inter, Roboto, RobotoDraft, Trebuchet, Muli and Lucida in hundreds
+ * of rules, so the override has to be broad and use !important.
+ *
+ * Self-hosted, no CDN — the app must work on an air-gapped install. Files live
+ * in webroot/font/ibm-plex-sans/ and are SIL OFL 1.1 licensed.
+ *
+ * Latin and Latin-Extended only. IBM Plex Sans has no Arabic/Hebrew coverage,
+ * so RTL locales fall through to the system stack below — which is correct,
+ * not a gap.
+ */
+
+/* ---------- Faces ---------- */
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-ext-400-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-500-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-ext-500-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-ext-600-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-700-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../font/ibm-plex-sans/ibm-plex-sans-latin-ext-700-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Application ---------- */
+
+:root {
+    --os-font: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+html,
+body,
+body * {
+    font-family: var(--os-font) !important;
+}
+
+/* Form controls do not inherit the document font in every browser. */
+input,
+select,
+textarea,
+button,
+optgroup,
+option,
+.form-control {
+    font-family: var(--os-font) !important;
+}
+
+/* Tabular figures wherever numbers are stacked and compared. */
+table td,
+table th,
+.tabular-nums,
+input[type="number"],
+input[type="date"],
+input[type="time"] {
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+ * ---------- Icon fonts: restore ----------
+ * MUST stay after the blanket rule above. These are ligature/PUA fonts — if the
+ * text family wins here, every icon renders as its literal name ("menu",
+ * "close") instead of a glyph.
+ */
+.material-icons,
+.material-icons *,
+i.material-icons {
+    font-family: "Material Icons" !important;
+}
+
+.material-icons-outlined,
+.material-icons-outlined * {
+    font-family: "Material Icons Outlined" !important;
+}
+
+.mdi,
+.mdi::before,
+[class^="mdi-"],
+[class^="mdi-"]::before,
+[class*=" mdi-"],
+[class*=" mdi-"]::before,
+.v-icon,
+.v-icon::before {
+    font-family: "Material Design Icons" !important;
+}
+
+.glyphicon,
+.glyphicon::before {
+    font-family: "Glyphicons Halflings" !important;
+}
+
+.fa,
+.fa::before,
+.fas,
+.far,
+.fab,
+[class^="fa-"]::before,
+[class*=" fa-"]::before {
+    font-family: FontAwesome !important;
+}
+
+/* TinyMCE renders inside an iframe with its own document, and its toolbar uses
+   its own icon set — leave the editor chrome alone. */
+.tox .tox-icon,
+.tox .tox-icon svg,
+.mce-ico,
+.mce-ico::before {
+    font-family: inherit !important;
+}

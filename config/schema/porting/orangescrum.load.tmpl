@@ -1,0 +1,60 @@
+/*
+ * pgloader job: durango (MySQL 8) -> durango-pg (PostgreSQL 16)
+ * Follows "Orangescrum Selfhosted MySQL -> Postgres Upgrade Guide" phase 6.
+ *
+ * Rendered from this template by ops/scripts/migrate.sh (var substitution) into
+ * ops/generated/pgloader/orangescrum.load, then run in the `pgloader` container.
+ *
+ * STRATEGY (per the guide): pgloader OWNS the schema. It builds the tables +
+ * data in the target's `public` schema directly from MySQL. The canonical phinx
+ * schema is NOT pre-created; the finalize command later patches types, identity
+ * columns and sequences. phinxlog / *_phinxlog are excluded — the finalize step
+ * stamps migration versions itself.
+ *
+ * Re-runnable: BEFORE LOAD drops both the leftover staging schema and public,
+ * so every run starts clean (truncate-on-load equivalent).
+ */
+
+LOAD DATABASE
+     FROM     mysql://${SRC_DB_USER}:${SRC_DB_PASSWORD}@${SRC_DB_HOST}:${SRC_DB_PORT}/${SRC_DB_NAME}
+     INTO postgresql://${TGT_DB_USER}:${TGT_DB_PASSWORD}@${TGT_DB_HOST}:${TGT_DB_PORT}/${TGT_DB_NAME}
+
+ WITH include drop,
+      create tables,
+      create indexes,
+      reset sequences,
+      foreign keys,
+      workers = 4,
+      concurrency = 1,
+      batch rows = 5000
+
+  SET PostgreSQL PARAMETERS
+      maintenance_work_mem to '256MB',
+      work_mem to '24MB'
+
+  SET MySQL PARAMETERS
+      net_read_timeout  = '600',
+      net_write_timeout = '600'
+
+  -- OrangeScrum treats 0/1 tinyint flags as ints, not booleans. MySQL zero-dates
+  -- ('0000-00-00') are invalid in PG: map to NULL and drop NOT NULL so legacy
+  -- rows load (the finalize step re-applies canonical constraints).
+  CAST type tinyint  to smallint  drop typemod,
+       type decimal  to numeric   keep typemod,
+       type date          drop not null using zero-dates-to-null,
+       type datetime  to timestamp drop not null using zero-dates-to-null,
+       type timestamp to timestamp drop not null using zero-dates-to-null
+
+  -- Migration versioning is re-stamped by the finalize command, not copied.
+  EXCLUDING TABLE NAMES MATCHING ~/phinxlog/
+
+  -- pgloader creates a PG schema named after the MySQL db; start clean then
+  -- promote it to public so it becomes the app's real schema.
+  BEFORE LOAD DO
+     $$ DROP SCHEMA IF EXISTS ${SRC_DB_NAME} CASCADE; $$,
+     $$ DROP SCHEMA IF EXISTS public CASCADE; $$
+
+  AFTER LOAD DO
+     $$ ALTER SCHEMA ${SRC_DB_NAME} RENAME TO public; $$,
+     $$ GRANT ALL ON SCHEMA public TO public; $$
+;

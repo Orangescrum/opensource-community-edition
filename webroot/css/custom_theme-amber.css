@@ -1,0 +1,55 @@
+:root {
+  /* Base colors */
+  --primary: #f59e0b;  /* Amber 500 - Main brand color */
+  --white: #ffffff;
+  
+  /* Gray scale with warm undertones */
+  --gray-100: #fffbeb;  /* Amber 50 - Lightest background */
+  --gray-200: #fef3c7;  /* Amber 100 - Light background */
+  --gray-300: #fde68a;  /* Amber 200 - Borders, dividers */
+  --gray-400: #fcd34d;  /* Amber 300 - Disabled states */
+  --gray-500: #f59e0b;  /* Amber 500 - Secondary text */
+  --gray-600: #b45309;  /* Amber 700 - For better contrast */
+
+  /* Status colors - Warm palette with better contrast */
+  --danger: #dc2626;    /* Red 600 - Error states */
+  --warning: #d97706;   /* Amber 600 - Warning states */
+  --info: #0284c7;      /* Sky 600 - Info states */
+  --success: #059669;   /* Emerald 600 - Success states */
+  
+  /* Additional colors - Enhanced for better UX */
+  --link: #92400e;      /* Amber 800 - Better link contrast */
+  --border: #fde68a;    /* Amber 200 - Subtle borders */
+  --background: var(--gray-100);    /* Softest amber background */
+  --background-secondary: var(--gray-200);  /* Subtle contrast for sections */
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors - Enhanced contrast */
+  --sidebar-bg: var(--primary);
+  --sidebar-text: var(--white);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--gray-600);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--gray-600);
+  --sidebar-icon: var(--primary);
+  --sidebar-icon-hover: var(--gray-600);
+  --sidebar-border: var(--gray-300);
+
+  /* Navbar - Improved interaction states */
+  --navbar-bg: var(--primary);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: rgba(255, 255, 255, 0.1);  /* Subtle hover effect */
+  --navbar-hover-text: var(--white);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--gray-600);
+  --navbar-icon: var(--gray-600);
+  --navbar-icon-hover: var(--gray-100);
+  --navbar-border: var(--gray-300);
+
+  /* Buttons */
+  --navbar-hover-text: var(--white);
+
+  /* Company logo */  
+  --company-logo-bg: var(--primary);
+  --company-logo-text: var(--white);
+}

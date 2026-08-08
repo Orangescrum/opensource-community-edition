@@ -1,0 +1,1 @@
+* * * * * www-data cd /var/www/html && timeout 50 sh ./bin/cake queue worker --max-runtime 45 >> /var/www/html/logs/queue_worker.log 2>&1

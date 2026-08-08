@@ -1,0 +1,4 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+*/30 * * * * www-data cd /var/www/html/ && sh ./bin/cake recurring_task >> /var/www/html/logs/recurring_task.log 2>&1

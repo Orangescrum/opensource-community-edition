@@ -1,0 +1,39 @@
+/**
+ * Local font declarations for self-hosted Orangescrum.
+ * No external CDN dependencies — all fonts served from /font/
+ */
+
+/* Inter — Variable Font (all weights 100-900) */
+@font-face {
+    font-family: 'Inter';
+    src: url('/font/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Raleway — Regular (400) */
+@font-face {
+    font-family: 'Raleway';
+    src: url('/font/Raleway-Regular.eot');
+    src: url('/font/Raleway-Regular.eot?#iefix') format('embedded-opentype'),
+         url('/font/Raleway-Regular.woff') format('woff'),
+         url('/font/Raleway-Regular.ttf') format('truetype'),
+         url('/font/Raleway-Regular.svg#Raleway-Regular') format('svg');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Raleway — Bold (700) */
+@font-face {
+    font-family: 'Raleway';
+    src: url('/font/Raleway-Bold.eot');
+    src: url('/font/Raleway-Bold.eot?#iefix') format('embedded-opentype'),
+         url('/font/Raleway-Bold.woff') format('woff'),
+         url('/font/Raleway-Bold.ttf') format('truetype'),
+         url('/font/Raleway-Bold.svg#Raleway-Bold') format('svg');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}

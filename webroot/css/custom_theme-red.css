@@ -1,0 +1,55 @@
+:root {
+  /* Base colors */
+  --primary: #ef4444;  /* Red 500 - Main brand color */
+  --white: #ffffff;
+  
+  /* Gray scale with warm undertones */
+  --gray-100: #fef2f2;  /* Red 50 - Lightest background */
+  --gray-200: #fee2e2;  /* Red 100 - Light background */
+  --gray-300: #fecaca;  /* Red 200 - Borders, dividers */
+  --gray-400: #fca5a5;  /* Red 300 - Disabled states */
+  --gray-500: #ef4444;  /* Red 500 - Secondary text */
+  --gray-600: #dc2626;  /* Red 600 - For better contrast */
+
+  /* Status colors - Warm palette with better contrast */
+  --danger: #991b1b;    /* Red 800 - Error states */
+  --warning: #d97706;   /* Amber 600 - Warning states */
+  --info: #0284c7;      /* Sky 600 - Info states */
+  --success: #059669;   /* Emerald 600 - Success states */
+  
+  /* Additional colors - Enhanced for better UX */
+  --link: #b91c1c;      /* Red 700 - Better link contrast */
+  --border: #fecaca;    /* Red 200 - Subtle borders */
+  --background: var(--gray-100);    /* Softest red background */
+  --background-secondary: var(--gray-200);  /* Subtle contrast for sections */
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors - Enhanced contrast */
+  --sidebar-bg: var(--primary);
+  --sidebar-text: var(--white);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--gray-600);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--gray-600);
+  --sidebar-icon: var(--primary);
+  --sidebar-icon-hover: var(--gray-600);
+  --sidebar-border: var(--gray-300);
+
+  /* Navbar - Improved interaction states */
+  --navbar-bg: var(--primary);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: rgba(255, 255, 255, 0.1);  /* Subtle hover effect */
+  --navbar-hover-text: var(--white);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--gray-600);
+  --navbar-icon: var(--gray-600);
+  --navbar-icon-hover: var(--gray-100);
+  --navbar-border: var(--gray-300);
+
+  /* Company logo */
+  --company-logo-bg: var(--primary);
+  --company-logo-text: var(--white);
+
+  /* Buttons */
+  --navbar-hover-text: var(--white);
+}

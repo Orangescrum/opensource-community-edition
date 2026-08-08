@@ -1,0 +1,57 @@
+:root {
+  /* Base colors - Gradient from Deep Orange to Orange */
+  --primary: linear-gradient(45deg, #ea580c, #f97316);  /* Deep Orange 500 to Orange 500 */
+  --white: #ffffff;
+
+  /* Gray scale with warm undertones */
+  --gray-100: #fff7ed;  /* Orange 50 */
+  --gray-200: #fed7aa;  /* Orange 200 */
+  --gray-300: #fdba74;  /* Orange 300 */
+  --gray-400: #fb923c;  /* Orange 400 */
+  --gray-500: #ea580c;  /* Deep Orange 600 */
+  --gray-600: #c2410c;  /* Deep Orange 700 */
+
+  /* Status colors (from default theme for consistency) */
+  --danger: #b91c1c;
+  --warning: #FF8C00;
+  --info: #3370b7;
+  --success: #56a06d;
+
+  /* Additional colors */
+  --link: #ea580c;
+  --border: var(--gray-300);
+  --background: #fff7ed;
+  --background-secondary: var(--gray-100);
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors */
+  --sidebar-bg: var(--white);
+  --sidebar-text: var(--gray-600);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--primary);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--primary);
+  --sidebar-icon: var(--gray-500);
+  --sidebar-icon-hover: var(--primary);
+  --sidebar-border: var(--gray-300);
+
+  /* navbar */
+  --navbar-bg: var(--white);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: var(--gray-100);
+  --navbar-hover-text: var(--primary);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--primary);
+  --navbar-icon: var(--gray-500);
+  --navbar-icon-hover: var(--primary);
+  --navbar-border: var(--gray-300);
+
+  /* Company logo */
+  --company-logo-bg: var(--white);
+  --company-logo-text: var(--primary);
+
+  /* Buttons */
+  --navbar-hover-text: var(--primary);
+}
+
+.details_item_tab .item_li{box-shadow: 0px 0px 10px var(--gray-300);} 

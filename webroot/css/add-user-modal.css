@@ -1,0 +1,172 @@
+/* Send-invite checkbox — defensive reset against global Materialize/Bootstrap
+   ::before/::after overlays + absolute positioning that mangle native checkboxes. */
+.send-invite-row {
+    margin: 6px 0 10px 0;
+}
+.send-invite-row .send-invite-lbl {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #2e2e2e !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+    position: static !important;
+}
+.send-invite-row .send-invite-lbl::before,
+.send-invite-row .send-invite-lbl::after {
+    content: none !important;
+    display: none !important;
+}
+.send-invite-row input.send-invite-cb,
+.send-invite-row input.send-invite-cb[type="checkbox"] {
+    -webkit-appearance: checkbox !important;
+    -moz-appearance: checkbox !important;
+    appearance: checkbox !important;
+    opacity: 1 !important;
+    position: static !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    accent-color: #ff7905;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+}
+.send-invite-row input.send-invite-cb::before,
+.send-invite-row input.send-invite-cb::after {
+    content: none !important;
+    display: none !important;
+}
+.send-invite-row .send-invite-text {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #2e2e2e !important;
+}
+
+/* User-password section — bypass .label-floating styles which overlay the
+   label on top of the input value. !important wins over the global
+   Bootstrap + Orangescrum form CSS that sets border:0 on .form-control
+   inside modals. */
+.user-pw-section .admin-pw-row { margin-top: 4px; }
+.user-pw-section .admin-pw-col { margin-bottom: 14px; }
+.user-pw-section .admin-pw-label {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #2e2e2e !important;
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    background: transparent !important;
+    top: auto !important;
+    left: auto !important;
+    line-height: 1.2 !important;
+}
+/* Cover all type states (password AND text after show-password toggle).
+   Listing both attribute variants + the bare class selector ensures
+   Bootstrap / Materialize input[type=text] rules never win. */
+.user-pw-section input.admin-pw-input,
+.user-pw-section input.admin-pw-input[type="password"],
+.user-pw-section input.admin-pw-input[type="text"] {
+    display: block !important;
+    width: 100% !important;
+    height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    color: #2e2e2e !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+.user-pw-section input.admin-pw-input:focus,
+.user-pw-section input.admin-pw-input[type="password"]:focus,
+.user-pw-section input.admin-pw-input[type="text"]:focus {
+    border-color: #ff7905 !important;
+    box-shadow: 0 0 0 2px rgba(255,121,5,0.15) !important;
+}
+.user-pw-section input.admin-pw-input::placeholder { color: #b0b0b0 !important; }
+.user-pw-section .admin-pw-wrap {
+    position: relative !important;
+    width: 100% !important;
+}
+.user-pw-section .admin-pw-wrap input.admin-pw-input {
+    padding-right: 42px !important;
+}
+.user-pw-section .admin-pw-toggle {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    height: 40px !important;
+    width: 40px !important;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    color: #888 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+.user-pw-section .admin-pw-toggle:hover { color: #ff7905 !important; }
+.user-pw-section .admin-pw-toggle .material-icons { font-size: 20px !important; }
+.user-pw-section .gen-pw-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin-top: 8px !important;
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #ff7905 !important;
+    background: transparent !important;
+    border: 1px solid #ff7905 !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+.user-pw-section .gen-pw-btn:hover {
+    background: #ff7905 !important;
+    color: #fff !important;
+}
+.user-pw-section .gen-pw-btn .material-icons {
+    font-size: 15px !important;
+    vertical-align: middle !important;
+}
+.user-pw-section .gen-pw-display {
+    display: none;
+    margin-top: 8px !important;
+    padding: 6px 10px !important;
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    color: #2e2e2e !important;
+    word-break: break-all !important;
+}
+.user-pw-section .gen-pw-display strong {
+    color: #666 !important;
+    font-size: 11px !important;
+    display: block !important;
+    margin-bottom: 2px !important;
+}

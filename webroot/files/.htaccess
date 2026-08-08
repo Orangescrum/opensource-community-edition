@@ -1,0 +1,26 @@
+# User-uploaded files live here. Under no circumstances should anything in this
+# tree be executed by the server — it must only ever be served as inert bytes.
+# This is the definitive backstop behind the upload extension allowlist: even if
+# a dangerous extension slipped through, PHP (and any other handler) will not run.
+
+# Disable the PHP engine for this directory and below (mod_php).
+<IfModule mod_php.c>
+    php_admin_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_admin_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_admin_flag engine off
+</IfModule>
+
+# Belt-and-suspenders: refuse to serve anything that maps to a code handler,
+# regardless of how PHP/CGI is wired up on the host.
+<FilesMatch "(?i)\.(php[0-9]?|phtml|phtm|pht|phar|phps|inc|cgi|pl|py|rb|sh|asp|aspx|jsp|jspx|cfm|shtml|svg|svgz|htaccess|htm|html|xhtml)$">
+    Require all denied
+</FilesMatch>
+
+# Strip any handler/type association and force downloads to be treated as data.
+RemoveHandler .php .phtml .phtm .pht .phar .phps .cgi .pl .py .rb .sh
+RemoveType .php .phtml .phtm .pht .phar .phps
+SetHandler none

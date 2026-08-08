@@ -1,0 +1,126 @@
+{
+    "map": {
+        "registration-welcome": "registration_welcome",
+        "forgot-password": "forgot_password",
+        "invite-user": "invite_user",
+        "invoice-email": "invoice_email",
+        "otp-code": "otp_code",
+        "task-assigned": "task_assigned",
+        "task-comment": "task_comment",
+        "task-status-change": "task_status_change",
+        "document-approval-request": "approval_request",
+        "document-approval-approved": "approval_approved",
+        "document-approval-rejected-changes-requested": "approval_rejected",
+        "document-approval-cancelled": "approval_cancelled",
+        "document-approval-workflow-completed": "approval_completed",
+        "document-approval-status-update-shared-by-timesheet-approval": "approval_status",
+        "approver-re-assigned": "approver_request",
+        "epics-approval-status-change": "epics_approval/approval_status_change",
+        "epics-approver-change": "epics_approval/approver_change",
+        "project-added-project-member": "project_add",
+        "workflow-action": "workflow_action"
+    },
+    "baseline_subs": {
+        "Insight 2.0 Project Management": "{{ companyName }} Project Management",
+        "Insight 2.0": "{{ companyName }}",
+        "PMO Team": "The {{ companyName }} Team",
+        "PIU Team": "The {{ companyName }} Team"
+    },
+    "template_subs": {
+        "registration_welcome": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{Rakesh M}": "{{ userName }}"
+        },
+        "forgot_password": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{Priya Sharma}": "{{ userName }}"
+        },
+        "invite_user": {
+            "{Rohan Verma}": "{{ userName }}"
+        },
+        "invoice_email": {
+            "{Rohan Verma}": "{{ userName }}"
+        },
+        "otp_code": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{482910}": "{{ otpCode }}"
+        },
+        "task_assigned": {
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Rohan Verma}": "{{ recipientName }}",
+            "{Add 2FA enrolment flow to customer portal}": "{{ case_title }}",
+            "{CPR-0043}": "{{ case_no }}",
+            "{Customer Portal Redesign}": "{{ projName }}",
+            "{Story}": "{{ cseTyp }}",
+            "{P2 - High}": "{{ priRity }}"
+        },
+        "task_comment": {
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Rohan Verma}": "{{ recipientName }}",
+            "{Add 2FA enrolment flow to customer portal}": "{{ case_title }}",
+            "{CPR-0043}": "{{ case_no }}",
+            "{Customer Portal Redesign}": "{{ projName }}",
+            "{Story}": "{{ cseTyp }}",
+            "{P2 - High}": "{{ priRity }}"
+        },
+        "task_status_change": {
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Pending Approval}": "{{ newStatus }}",
+            "{Rohan Verma}": "{{ recipientName }}",
+            "{Add 2FA enrolment flow to customer portal}": "{{ case_title }}",
+            "{CPR-0043}": "{{ case_no }}",
+            "{Customer Portal Redesign}": "{{ projName }}",
+            "{Story}": "{{ cseTyp }}",
+            "{P2 - High}": "{{ priRity }}"
+        },
+        "approval_request": {
+            "{CSP Team}": "{{ userName }}",
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Functional Requirements Specification (FRS) - Module 4 (Auth)}": "{{ docName }}"
+        },
+        "approval_approved": {
+            "{CSP Team}": "{{ userName }}",
+            "{Functional Requirements Specification (FRS) - Module 4 (Auth)}": "{{ docName }}"
+        },
+        "approval_rejected": {
+            "{CSP Team}": "{{ userName }}",
+            "{Functional Requirements Specification (FRS) - Module 4 (Auth)}": "{{ docName }}"
+        },
+        "approval_cancelled": {
+            "{CSP Team}": "{{ userName }}",
+            "{Functional Requirements Specification (FRS) - Module 4 (Auth)}": "{{ docName }}"
+        },
+        "approval_completed": {
+            "{CSP Team}": "{{ userName }}",
+            "{Functional Requirements Specification (FRS) - Module 4 (Auth)}": "{{ docName }}"
+        },
+        "approval_status": {
+            "{CSP Team}": "{{ userName }}",
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Rakesh M}": "{{ submitterName }}"
+        },
+        "approver_request": {
+            "{CSP Team}": "{{ userName }}",
+            "{Priya Sharma}": "{{ actorName }}"
+        },
+        "epics_approval/approval_status_change": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{Self-Service Account Management (Epic)}": "{{ epicName }}",
+            "{Pending Review}": "{{ previousStatus }}"
+        },
+        "epics_approval/approver_change": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{Self-Service Account Management (Epic)}": "{{ epicName }}",
+            "{Karthik Krishnan}": "{{ previousApprover }}",
+            "{Siddharth Joshi}": "{{ newApprover }}"
+        },
+        "project_add": {
+            "{Rohan Verma}": "{{ userName }}",
+            "{Priya Sharma}": "{{ actorName }}",
+            "{Customer Portal Redesign}": "{{ projName }}"
+        },
+        "workflow_action": {
+            "{Rohan Verma}": "{{ userName }}"
+        }
+    }
+}

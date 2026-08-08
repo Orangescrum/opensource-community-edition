@@ -1,0 +1,26 @@
+{
+  "name": "@orangescrum/email-templating",
+  "version": "1.0.0",
+  "description": "Vue 3 + Vuetify 3 Email Templating Plugin",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "watch": "vite build --watch",
+    "format": "prettier --write \"templates/**/*.{vue,js,css}\"",
+    "format:check": "prettier --check \"templates/**/*.{vue,js,css}\""
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.6.7",
+    "vue": "^3.4.21",
+    "vuetify": "^3.5.10"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "prettier": "^3.8.3",
+    "sass": "^1.71.1",
+    "vite": "^6.1.7"
+  }
+}

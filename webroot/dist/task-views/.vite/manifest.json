@@ -1,0 +1,55 @@
+{
+  "_task-views-vue.js": {
+    "file": "task-views-vue.js",
+    "name": "vue"
+  },
+  "_task-views-vuetify.css": {
+    "file": "task-views-vuetify.css",
+    "src": "_task-views-vuetify.css"
+  },
+  "_task-views-vuetify.js": {
+    "file": "task-views-vuetify.js",
+    "name": "vuetify",
+    "imports": [
+      "_task-views-vue.js"
+    ],
+    "css": [
+      "task-views-vuetify.css"
+    ]
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.eot": {
+    "file": "task-views-materialdesignicons-webfont.eot",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.eot"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.ttf": {
+    "file": "task-views-materialdesignicons-webfont.ttf",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.ttf"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff": {
+    "file": "task-views-materialdesignicons-webfont.woff",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff"
+  },
+  "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2": {
+    "file": "task-views-materialdesignicons-webfont.woff2",
+    "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2"
+  },
+  "src/main.js": {
+    "file": "task-views.js",
+    "name": "main",
+    "src": "src/main.js",
+    "isEntry": true,
+    "imports": [
+      "_task-views-vue.js",
+      "_task-views-vuetify.js"
+    ],
+    "css": [
+      "task-views-main.css"
+    ],
+    "assets": [
+      "task-views-materialdesignicons-webfont.eot",
+      "task-views-materialdesignicons-webfont.woff2",
+      "task-views-materialdesignicons-webfont.woff",
+      "task-views-materialdesignicons-webfont.ttf"
+    ]
+  }
+}

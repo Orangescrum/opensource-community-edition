@@ -1,0 +1,57 @@
+:root {
+  /* Base colors - Gradient from Indigo to Blue */
+  --primary: linear-gradient(45deg, #6366f1, #3b82f6);  /* Indigo 500 to Blue 500 */
+  --white: #ffffff;
+
+  /* Gray scale with cool undertones */
+  --gray-100: #eef2ff;  /* Indigo 50 */
+  --gray-200: #c7d2fe;  /* Indigo 200 */
+  --gray-300: #a5b4fc;  /* Indigo 300 */
+  --gray-400: #818cf8;  /* Indigo 400 */
+  --gray-500: #4f46e5;  /* Indigo 600 */
+  --gray-600: #4338ca;  /* Indigo 700 */
+
+  /* Status colors (from default theme for consistency) */
+  --danger: #b91c1c;
+  --warning: #FF8C00;
+  --info: #3370b7;
+  --success: #56a06d;
+
+  /* Additional colors */
+  --link: #4f46e5;
+  --border: var(--gray-300);
+  --background: #eef2ff;
+  --background-secondary: var(--gray-200);
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors */
+  --sidebar-bg: var(--white);
+  --sidebar-text: var(--gray-600);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--primary);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--primary);
+  --sidebar-icon: var(--gray-500);
+  --sidebar-icon-hover: var(--primary);
+  --sidebar-border: var(--gray-300);
+
+  /* navbar */
+  --navbar-bg: var(--white);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: var(--gray-100);
+  --navbar-hover-text: var(--primary);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--primary);
+  --navbar-icon: var(--gray-500);
+  --navbar-icon-hover: var(--primary);
+  --navbar-border: var(--gray-300);
+
+  /* Company logo */
+  --company-logo-bg: var(--white);
+  --company-logo-text: var(--primary);
+
+  /* Buttons */
+  --navbar-hover-text: var(--primary);
+}
+
+.details_item_tab .item_li{box-shadow: 0px 0px 10px var(--gray-300);} 

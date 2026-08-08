@@ -1,0 +1,14 @@
+// Vuetify's stylesheet, minus its spacing/display utility classes.
+//
+// The prebuilt "vuetify/styles" ships ~435 utilities (.pl-15, .mt-5, .pr-15 …)
+// declared !important. This bundle loads on pages that also render the legacy
+// app, which has its own classes by exactly those names — .pl-15 means 15px
+// there and 60px in Vuetify's 4px scale — so the legacy chrome silently
+// inherited Vuetify's spacing and, for instance, the task-detail header lost
+// ~90px of a 162px column to padding.
+//
+// This app styles itself from tokens.css and scoped component CSS, so none of
+// those utilities are wanted. Vuetify is loaded for behaviour, not layout.
+@use "vuetify" with (
+    $utilities: false
+);

@@ -1,0 +1,55 @@
+:root {
+  /* Base colors */
+  --primary: #14b8a6;  /* Teal 500 - Main brand color */
+  --white: #ffffff;
+  
+  /* Gray scale with cool undertones */
+  --gray-100: #f0fdfa;  /* Teal 50 - Lightest background */
+  --gray-200: #ccfbf1;  /* Teal 100 - Light background */
+  --gray-300: #99f6e4;  /* Teal 200 - Borders, dividers */
+  --gray-400: #5eead4;  /* Teal 300 - Disabled states */
+  --gray-500: #14b8a6;  /* Teal 500 - Secondary text */
+  --gray-600: #0d9488;  /* Teal 600 - For better contrast */
+
+  /* Status colors - Cool palette with better contrast */
+  --danger: #dc2626;    /* Red 600 - Error states */
+  --warning: #d97706;   /* Amber 600 - Warning states */
+  --info: #0284c7;      /* Sky 600 - Info states */
+  --success: #059669;   /* Emerald 600 - Success states */
+  
+  /* Additional colors - Enhanced for better UX */
+  --link: #0f766e;      /* Teal 700 - Better link contrast */
+  --border: #99f6e4;    /* Teal 200 - Subtle borders */
+  --background: var(--gray-100);    /* Softest teal background */
+  --background-secondary: var(--gray-200);  /* Subtle contrast for sections */
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors - Enhanced contrast */
+  --sidebar-bg: var(--primary);
+  --sidebar-text: var(--white);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--gray-600);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--gray-600);
+  --sidebar-icon: var(--primary);
+  --sidebar-icon-hover: var(--gray-600);
+  --sidebar-border: var(--gray-300);
+
+  /* Navbar - Improved interaction states */
+  --navbar-bg: var(--primary);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: rgba(255, 255, 255, 0.1);  /* Subtle hover effect */
+  --navbar-hover-text: var(--white);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--gray-600);
+  --navbar-icon: var(--gray-600);
+  --navbar-icon-hover: var(--gray-100);
+  --navbar-border: var(--gray-300);
+
+  /* Company logo */
+  --company-logo-bg: var(--primary);
+  --company-logo-text: var(--white);
+
+  /* Buttons */
+  --navbar-hover-text: var(--white);
+}

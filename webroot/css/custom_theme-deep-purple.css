@@ -1,0 +1,51 @@
+:root {
+  /* Base colors */
+  --primary: #7c3aed;  /* Deep Purple 500 - Main brand color */
+  --white: #ffffff;
+  
+  /* Gray scale with purple undertones */
+  --gray-100: #f5f3ff;  /* Deep Purple 50 - Lightest background */
+  --gray-200: #ede9fe;  /* Deep Purple 100 - Light background */
+  --gray-300: #ddd6fe;  /* Deep Purple 200 - Borders, dividers */
+  --gray-400: #c4b5fd;  /* Deep Purple 300 - Disabled states */
+  --gray-500: #7c3aed;  /* Deep Purple 500 - Secondary text */
+  --gray-600: #6d28d9;  /* Deep Purple 600 - For better contrast */
+
+  /* Status colors - Rich palette with better contrast */
+  --danger: #dc2626;    /* Red 600 - Error states */
+  --warning: #d97706;   /* Amber 600 - Warning states */
+  --info: #0284c7;      /* Sky 600 - Info states */
+  --success: #059669;   /* Emerald 600 - Success states */
+  
+  /* Additional colors - Enhanced for better UX */
+  --link: #5b21b6;      /* Deep Purple 700 - Better link contrast */
+  --border: #ddd6fe;    /* Deep Purple 200 - Subtle borders */
+  --background: var(--gray-100);    /* Softest deep purple background */
+  --background-secondary: var(--gray-200);  /* Subtle contrast for sections */
+  --icon-color: var(--white);
+
+  /* Sidebar specific colors - Enhanced contrast */
+  --sidebar-bg: var(--primary);
+  --sidebar-text: var(--white);
+  --sidebar-hover-bg: var(--gray-100);
+  --sidebar-hover-text: var(--gray-600);
+  --sidebar-active-bg: var(--gray-100);
+  --sidebar-active-text: var(--gray-600);
+  --sidebar-icon: var(--primary);
+  --sidebar-icon-hover: var(--gray-600);
+  --sidebar-border: var(--gray-300);
+
+  /* Navbar - Improved interaction states */
+  --navbar-bg: var(--primary);
+  --navbar-text: var(--gray-600);
+  --navbar-hover-bg: rgba(255, 255, 255, 0.1);  /* Subtle hover effect */
+  --navbar-hover-text: var(--white);
+  --navbar-active-bg: var(--gray-100);
+  --navbar-active-text: var(--gray-600);
+  --navbar-icon: var(--gray-600);
+  --navbar-icon-hover: var(--gray-100);
+  --navbar-border: var(--gray-300);
+
+  /* Buttons */
+  --navbar-hover-text: var(--white);
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@orangescrum/desktop",
+  "version": "0.1.0",
+  "description": "Orangescrum Community Edition desktop shell (Windows-first, Tauri 2)",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "icon": "tauri icon src-tauri/icons/source-logo.png",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

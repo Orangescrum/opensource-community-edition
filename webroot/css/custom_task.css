@@ -1,0 +1,32 @@
+/* Task Page Custom Css */
+.kanban_board_container .kanban-auto-scroll{width:100%!important;overflow-x:auto!important}
+.task_listing table.table tr{border-bottom:2px solid #e1e1e1}
+        .ellipsis-view-display{text-overflow:ellipsis;white-space:nowrap}
+        .cmn-popup table.table.us-list td{color:#232323}
+        .task_listing table.table.tb-list th a{color:#232323;font-weight:600}
+        .oya-blk small.green-txt{color:#71cb8d;margin:0;font-size:12px;display:flex}
+        .cmn-popup table.table.tb-list td,.task_listing table.table.tb-list td{color:#000}
+        .role_user_scroll table tr:hover{background:#f5f5f5}
+        .cmn_popup .user_role_modal tr.hdr_tr th{background:#fff}
+        .role_user_scroll table tr{border-bottom:2px solid #e1e1e1}
+        .table-striped>tbody>tr:nth-of-type(odd):hover{background-color:none}
+        .add-pop .select_field_wrapper .select2.select2-container--default .select2-selection{height:40px;line-height:45px;border-radius:4px!important;border:unset!important}
+        .select_field_wrapper .select2.select2-container--default .select2-selection .select2-selection__arrow{height:100%;position:absolute;top:0;right:10px;width:20px}
+        .task_detail_container .quick_option_detail .detail_fld_data div{width:100%}
+.app_sel_epic .new_lab_style{position:relative;top:7px;left:8px;z-index:2;background:#fff;padding:0 5px;margin-top:0!important}
+.task_title_hover.ellipsis-view{width:100%}
+.cmn_custom_dtable table tbody tr td{border-left:1px solid #fff!important}    
+.kanban_board_container .kanban-view-lists .kanban-child { margin: 0; padding: 0 10px; }
+.add_users_to_project .modal-dialog .select2-container--default .select2-selection--multiple ul.select2-selection__rendered { display: inline-flex; align-items: center;}
+
+.new_business_unit.cmn_popup .form-group.label-floating:not(.is-empty) label.control-label { padding: 0 15px; }
+.new_business_unit.cmn_popup .select_field_wrapper.mark_mandatory .control-label::after { top: -2px; }
+.osinvite-user-pop .popup-container .form-group { margin: 15px 0 10px 0; }
+.assign-user-pop .select-user-field-label ul li::before,.assign-user-pop .select-user-field-label ul{ border-bottom:0px; }   
+.stat-plan .select2-container .select2-selection--single { height: 38px; }
+
+
+/* Epic/Feature rows: disabled selection checkbox shows not-allowed cursor on the material checkbox span */
+.checkbox.chk-not-allowed label,
+.checkbox.chk-not-allowed .checkbox-material,
+.checkbox.chk-not-allowed .checkbox-material .check { cursor: not-allowed; }

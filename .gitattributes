@@ -1,0 +1,39 @@
+# Normalise line endings.
+#
+# Without this, a Windows clone with core.autocrlf=true rewrites shell scripts to
+# CRLF on checkout. The app runs in a Linux container, so `bin/cake` then dies at
+# the shebang with:
+#     /usr/bin/env: 'sh\r': No such file or directory
+#
+# Everything is stored and checked out as LF, except the Windows-only launcher.
+
+* text=auto eol=lf
+
+# Windows batch files must keep CRLF or cmd.exe mis-parses them
+*.bat text eol=crlf
+
+# Explicitly LF — these are executed in the container
+bin/cake text eol=lf
+bin/bash_completion.sh text eol=lf
+*.sh text eol=lf
+
+# Binary assets — never transform
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svgz binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.mp4 binary
+*.webm binary
+*.xlsx binary
+*.docx binary
+*.pptx binary

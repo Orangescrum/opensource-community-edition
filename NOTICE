@@ -1,0 +1,62 @@
+Orangescrum Community Edition
+Copyright (c) 2026 Andolasoft Inc.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
+
+The complete licence text is in the file LICENSE in the root of this
+distribution.
+
+--------------------------------------------------------------------------------
+Network use and source availability
+--------------------------------------------------------------------------------
+
+Section 13 of the AGPL applies to this program. If you modify it and let others
+interact with it over a network, you must offer those users access to the
+corresponding source of your modified version, at no charge.
+
+The corresponding source for unmodified releases is published at the repository
+recorded in EDITION_SOURCE_URL (see config/globalVars.php) and shown on the
+in-application About page under Settings.
+
+--------------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------------
+
+Portions of this distribution derive from the CakePHP application skeleton:
+
+    CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
+    Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
+    Licensed under The MIT License
+
+Files carrying that notice retain it, as the MIT licence requires. Their
+inclusion in this distribution does not change their origin or their own terms;
+the combined work is distributed under the AGPL.
+
+This product also bundles third-party open-source packages installed via
+Composer, each under its own licence. A consolidated list, with the full licence
+text of every bundled package, is generated at build time into:
+
+    THIRD_PARTY_NOTICES.txt
+
+That file is a build artefact and is not tracked in version control. To
+regenerate it:
+
+    php bin/generate-third-party-notices.php
+
+Trademarks
+----------
+
+"Orangescrum" and the Orangescrum logo are trademarks of Andolasoft Inc. The
+AGPL grants rights to the software; it does not grant permission to use these
+marks. Redistributions of modified versions should not use the marks in a way
+that suggests endorsement by, or affiliation with, Andolasoft Inc.

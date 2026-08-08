@@ -1,0 +1,193 @@
+<?php $json_data = null;
+$closed = 0;
+$legend = array(1 => __("New",true), 2 => __("In-Progress",true), 3 => __("Closed",true), 4 => __("Start",true), 5 => __("Resolved",true), 6 => __("Modified",true), 10 => __("Modified",true));
+$color = array(1 => "#F19A91", 2 => "#8DC2F8", 3 => "#8AD6A3", 4 => "#A78AB6", 5 => "#F3C788", 6 => "#FFF363",10=>"#c2c2c2");
+
+if(is_array($project_status['status']) && count($project_status['status'])>0){
+    if(isset($project_status['status'][4])){
+        $project_status['status'][2]+=$project_status['status'][4];
+        unset($project_status['status'][4]);
+    }
+    if(isset($project_status['status'][6])){
+        $project_status['status'][2]+=$project_status['status'][6];
+        unset($project_status['status'][6]);
+    }
+    unset($project_status['status'][10]);
+    $i =0;
+    foreach($project_status['common_qry'] as $key=>$val){
+        if($val['legend'] == 3){
+            $closed += $val['tot_count'];
+        }
+        if($val['custom_status_id']){
+            $json_data['data'][$i]['name'] = $project_status['csts_arr'][$val['custom_status_id']]['name'];
+            $json_data['data'][$i]['y'] = $val['tot_count'];
+            $json_data['data'][$i]['color'] = '#'.$project_status['csts_arr'][$val['custom_status_id']]['color'];
+        }else{
+            $json_data['data'][$i]['name'] = $legend[$val['legend']];
+            $json_data['data'][$i]['y'] = $val['tot_count'];
+            $json_data['data'][$i]['color'] = $color[$val['legend']];
+        }
+        $i++;
+    }
+    $json_data_out = '';
+    if(!empty($json_data['data'])){
+        foreach($json_data['data'] as $key=>$val){
+            $json_data_out.= "{name:'".$val['name']."',y:".$val['y'].",color:'".$val['color']."'}, ";
+        }
+    }
+}else{
+    if(isset($project_status['extra']) && $project_status['extra'] == 'overview'){
+        echo "<figure style='margin: 30px auto;text-align: center;'><img src='" . HTTP_ROOT . "img/no-data/sample_image_1.png' alt='No Data' /></figure>";
+    }else{
+        echo "<center><img src='".HTTP_ROOT."/img/sample/dashboard/staus.png' alt='' style='max-width:100%;max-height:100%;'/></center>";
+    }
+    exit;
+}?>
+<div id="project_status_pie<?php echo $fragment?>"></div>
+<?php
+$showLabel = true;
+if($project_status['extra'] == 'overview'){
+    $showLabel = false;;
+}
+?>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var show_legend = true;
+        var data = [<?php echo trim($json_data_out);?>];
+
+        $('.chat_status_result').find('h6').text(0);//set default value
+        var total = 0;
+        for(var i in data){
+            total = total+parseInt(data[i].y);
+        }
+        $('.status_total').text(total);
+        $('#ov_tsk_entry_cnt').text(total);
+        var hash = window.location.hash.substr(1);
+        if (hash != 'overview') {
+            var height = 230;
+            var x = 0;
+            var y = -40;
+            var align = 'right';
+            var verticalAlign = 'top';
+            var innerSize = '50%';
+            var width = 170;
+            var layout = 'vertical';
+            var text = '';
+        } else {
+            var height = 175;
+            var x = -65;
+            var y = 0;
+            var align = 'right';
+            var verticalAlign = 'middle';
+            var innerSize = '95%';
+            var width = 120;
+            var layout = 'vertical';
+            var text = '<?php echo $closed;?> / <?php echo $project_status['total'];?> <br> <?php echo __("Closed");?>';
+        }
+        $('#project_status_pie<?php echo $project_status['fragment']?>').highcharts({
+            credits: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false,
+                buttons: {
+                    contextButton: {
+                        symbolStrokeWidth: 2,
+                        symbolStroke: '#969696',
+                        menuItems: [{
+                            text: 'PNG',
+                            onclick: function() {
+                                this.exportChart();
+                            },
+                            separator: false
+                        }, {
+                            text: 'JPEG',
+                            onclick: function() {
+                                this.exportChart({
+                                    type: 'image/jpeg'
+                                });
+                            },
+                            separator: false
+                        }, {
+                            text: 'PDF',
+                            onclick: function() {
+                                this.exportChart({
+                                    type: 'application/pdf'
+                                });
+                            },
+                            separator: false
+                        }, {
+                            text: 'Print',
+                            onclick: function() {
+                                this.print();
+                            },
+                            separator: false
+                        }]
+                    }
+                },
+            },
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                height: height
+            },
+            title: {
+                align: "center",
+                floating: true,
+                margin: 0,
+                style: {
+                    "color": "#333333",
+                    "fontSize": "18px"
+                },
+                text: text,
+                useHTML: false,
+                verticalAlign: "middle",
+                x: x,
+                y: y
+            },
+            tooltip: {
+                formatter: function() {
+                    var precsson = 3;
+                    if (this.point.percentage < 1)
+                        precsson = 2;
+                    if (this.point.percentage >= 10)
+                        precsson = 4;
+                    return '<b>' + this.point.name + '</b>: ' + parseFloat((this.point.percentage).toPrecision(precsson)) + ' %';
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    borderWidth: 0,
+                    showInLegend: show_legend,
+                    dataLabels: {
+                        enabled: false,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            legend: {
+                enabled: true,
+                layout: layout,
+                align: align,
+                verticalAlign: verticalAlign,
+                width: width,
+                borderWidth: null,
+                labelFormatter: function() {
+                    return this.name + ' - ' + this.y + '';
+                }
+            },
+            series: [{
+                size: '100%',
+                innerSize: innerSize,
+                type: 'pie',
+                name: ' ',
+                data: data,
+            }]
+        });
+    });
+</script>

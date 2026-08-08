@@ -1,0 +1,266 @@
+.os_plus a .ctask_icn {
+    opacity: 0;
+    transform: rotate(225deg);
+    visibility: hidden;
+}
+
+.os_plus.prj_btn {
+    display: none;
+    position: absolute;
+    top: -60px;
+    left: 0px;
+    padding: 0px 4px 10px 4px;
+}
+
+.os_plus.mdl_btn {
+    display: none;
+    position: absolute;
+    top: -115px;
+    left: 0px;
+    padding: 0px 4px 10px 4px;
+}
+
+.os_plus.actn_btn {
+    display: none;
+    position: absolute;
+    top: -170px;
+    left: 0px;
+    padding: 0px 4px 10px 4px;
+}
+
+.os_plus.mdl_btn a,
+.os_plus.actn_btn a,
+.os_plus.prj_btn a {
+    height: 47px;
+    width: 47px;
+}
+
+.crt_task_btn_btm:hover .os_plus.prj_btn,
+.crt_task_btn_btm:hover .os_plus.mdl_btn,
+.crt_task_btn_btm:hover .os_plus.actn_btn {
+    display: block;
+}
+
+/* ----------Accordion Starts--------------*/
+.u-vmenu ul li {
+    width: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.u-vmenu ul ul {
+    display: none;
+}
+
+/*.u-vmenu > ul > li {background-color:#f5f5f5;border:1px solid #ddd;margin-bottom:10px;}*/
+.u-vmenu ul li a {
+    height: auto;
+    line-height: 30px;
+    display: block;
+    font-size: 14px;
+    color: #82846f;
+    text-decoration: none;
+    outline: none;
+}
+
+.u-vmenu>ul>li>a {
+    height: 42px;
+    line-height: 42px;
+    padding-left: 30px;
+    font-weight: 600;
+    position: relative;
+    background-color: #f5f5f5 !important;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.u-vmenu>ul>li>ul>li>a {
+    height: auto;
+    padding: 10px;
+    background-image: none !important;
+    background-color: rgb(148, 179, 236) !important;
+    margin-bottom: 10px;
+    display: inline-block;
+    color: #fff;
+    line-height: 20px;
+    border-radius: 5px
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>a:not(.btn) {
+    padding: 10px;
+    background-image: none !important;
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>a[data-option='on'] {
+    background-color: rgb(148, 179, 236) !important;
+    background-image: none !important;
+    border-radius: 5px;
+    color: #fff;
+    display: inline-block;
+    line-height: 16px;
+    padding: 5px 20px;
+}
+
+.u-vmenu>ul>li>ul>li>ul {
+    background-color: #f5f5f5;
+    margin-bottom: 10px;
+    position: relative;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+.u-vmenu>ul>li>ul>li>ul:before {
+    content: '';
+    border-left: 1px solid #ccc;
+    position: absolute;
+    left: 10px;
+    top: 0;
+    height: 100%;
+    display: block
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li:before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: #ccc;
+    border-radius: 50%;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -22px;
+    top: 25px;
+    bottom: 0;
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>ul {
+    margin: 20px 0 10px
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>ul>li {
+    display: inline-block;
+    width: 45%;
+    margin: 5px 0
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>ul>li>a .action {
+    width: 250px;
+    display: inline-block;
+}
+
+.u-vmenu>ul>li>ul>li>ul>form>li>ul>li>a span {
+    margin-left: 20px;
+}
+
+.u-vmenu ul li a[data-option='on'] {
+    background: url(<?php echo HTTP_ROOT; ?>img/left-arrow.png) 5px center no-repeat;
+}
+
+.u-vmenu ul li a[data-option='off'] {
+    background: url(<?php echo HTTP_ROOT; ?>img/right-arrow.png) left center no-repeat;
+}
+
+/*.u-vmenu ul.1st_menu .has-children a[data-option='on']{background: url(<?php echo HTTP_ROOT; ?>img/left-arrow.png) 5px center no-repeat;}
+    .u-vmenu ul.1st_menu .has-children a[data-option='off'] {background: url(<?php echo HTTP_ROOT; ?>img/right-arrow.png) left center no-repeat;}*/
+.u-vmenu .edit-close {
+    display: inline-block;
+    position: absolute;
+    right: 20px;
+    cursor: pointer
+}
+
+.u-vmenu .edit-close span {
+    background-image: url(<?php echo HTTP_ROOT; ?>img/role-icons.png);
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+.u-vmenu .user {
+    background-position: 16px -185px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .user:hover {
+    background-position: 16px -168px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .edit {
+    background-position: 0px -31px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .edit:hover {
+    background-position: 0px 3px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .close {
+    background-position: -17px 85px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .close {
+    background-position: -17px 85px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .close:hover {
+    background-position: -31px 85px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .close .delete-rolegrp-div {
+    position: absolute;
+    z-index: 999;
+    background: #fff;
+    font-weight: normal;
+    width: 200px;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    top: 15px;
+    right: 0;
+    display: none;
+    font-size: 13px;
+    line-height: 20px;
+    height: auto;
+}
+
+.u-vmenu .close .delete-rolegrp-div hr {
+    margin: 0
+}
+
+.u-vmenu .close .delete-rolegrp-div span {
+    display: block
+}
+
+.u-vmenu .close:hover .delete-rolegrp-div {
+    display: block;
+}
+
+.u-vmenu .delete {
+    background-position: 0px 51px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .delete:hover {
+    background-position: -19px 51px;
+    margin: 0 10px 0
+}
+
+.u-vmenu .action {
+    cursor: default
+}
+
+label {
+    display: inline-block !important;
+}
+
+.edit-close .close {
+    opacity: 1;
+}

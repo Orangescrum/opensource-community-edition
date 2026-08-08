@@ -1,0 +1,75 @@
+name: orangescrum
+
+# Single self-contained stack: Orangescrum app + PostgreSQL.
+#   docker compose up -d --build
+#
+# Every instance-specific value (ports, credentials, public URL) comes from the
+# environment with sensible defaults — copy .env.example to .env to override.
+# Nothing is hard-coded here.
+
+services:
+  orangescrum-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      # Host port is configurable; the container always listens on 80.
+      - "${APP_PORT:-8080}:80"
+    environment:
+      DB_HOST: orangescrum-postgres
+      DB_PORT: "5432"
+      DB_USERNAME: ${DB_USERNAME:-orangescrum}
+      DB_PASSWORD: ${DB_PASSWORD:-orangescrum}
+      DB_NAME: ${DB_NAME:-orangescrum}
+      CACHE_ENGINE: ${CACHE_ENGINE:-file}
+      # Persisted security salt (hashing / CSRF / sessions). Set it in .env so
+      # it stays stable across container/app_local rebuilds; leave it unset to
+      # let the installer generate a random per-install salt.
+      SECURITY_SALT: ${SECURITY_SALT:-}
+      # Public URL the browser uses — MUST match the published host port and
+      # scheme. Set FULL_BASE_URL in .env when you change APP_PORT or use HTTPS.
+      FULL_BASE_URL: ${FULL_BASE_URL:-http://localhost:8080}
+      # Set to "true" only when served over HTTPS (e.g. behind a TLS proxy).
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-ORANGESCRUM_SESSID}
+      CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-orangescrum_csrf}
+    volumes:
+      - orangescrum-app-files:/var/www/html/webroot/files
+      - orangescrum-app-config:/var/www/html/config
+    depends_on:
+      orangescrum-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - orangescrum-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  orangescrum-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-orangescrum}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-orangescrum}
+      POSTGRES_DB: ${DB_NAME:-orangescrum}
+    volumes:
+      - orangescrum-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - orangescrum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-orangescrum}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  orangescrum-app-files:
+  orangescrum-app-config:
+  orangescrum-postgres-data:
+
+networks:
+  orangescrum-network:
+    driver: bridge

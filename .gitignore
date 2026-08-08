@@ -1,0 +1,162 @@
+# CakePHP 3
+
+/vendor/*
+
+# Claude Code
+.claude/
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build artifacts
+cookies.txt
+
+# Font files in Vue dist (already in webroot/font/)
+webroot/dist/status-workflow/assets/*.ttf
+webroot/dist/status-workflow/assets/*.eot
+webroot/dist/status-workflow/assets/*.woff
+webroot/dist/status-workflow/assets/*.woff2
+
+/tmp/cache/models/*
+!/tmp/cache/models/empty
+/tmp/cache/persistent/*
+!/tmp/cache/persistent/empty
+/tmp/cache/views/*
+!/tmp/cache/views/empty
+/tmp/sessions/*
+!/tmp/sessions/empty
+/tmp/tests/*
+!/tmp/tests/empty
+
+/logs/*
+!/logs/empty
+
+# CakePHP 2
+
+/app/tmp/*
+/app/Config/core.php
+/app/Config/database.php
+/vendors/*
+
+
+# CakePHP specific files #
+##########################
+/config/app_local.php
+/config/.env
+/.env
+/logs/*
+/tmp/*
+/vendor/*
+
+# OS Installation Config files
+##########################
+config/install.ini
+config/smtp.php
+config/smtp.history.json
+config/sendgrid.php
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+# Icon must end with two \r
+Icon
+
+ehthumbs.db
+Thumbs.db
+.directory
+
+# Tool specific files #
+#######################
+# PHPUnit
+.phpunit.result.cache
+tests.sqlite
+# vim
+*~
+*.swp
+*.swo
+# sublime text & textmate
+*.sublime-*
+*.stTheme.cache
+*.tmlanguage.cache
+*.tmPreferences.cache
+# Eclipse
+.settings/*
+# JetBrains, aka PHPStorm, IntelliJ IDEA
+.idea/*
+# NetBeans
+nbproject/*
+# Visual Studio Code
+.vscode
+# nova
+.nova
+# Sass preprocessor
+.sass-cache/
+# node
+/node_modules/*
+# yarn
+yarn-debug.log
+yarn-error.log
+
+composer.lock
+composer.phar
+webroot/files/case_files/*
+webroot/files/case_files/temp/*
+config/Migrations/schema-dump-default.lock
+webroot/files/profile/orig/*
+
+webroot/files/photos/* 
+!webroot/files/photos/user.png
+webroot/files/test_governer_files/*
+webroot/files/resource_utilization/
+.php-cs-fixer.php
+.php-cs-fixer.cache
+.zed/
+config/install_info.json
+cachegrind/*
+config/storage.php
+storage/data
+storage/data/*
+rector.php
+plugins/*/config/Migrations/schema-dump-default.lock
+.phpactor.json
+php-cs-fixer.phar
+webroot/pdfreports/tasks/*pdf
+webroot/timesheetpdf/pdf/*.pdf
+*.key
+*.pem
+webroot/temp/*
+webroot/csv/resource_availability_csv/
+config/github.php
+config/gitsync.php
+config/gitsync_*.php
+config/debug_kit.php
+config/os_config.php
+.venv
+/tests/
+/phpunit.xml
+/phpunit.playwright.xml
+/phpunit.xml.dist
+.claude/CLAUDE.md
+
+# Local dev-only scaffolding — do not commit
+docker-compose.al.yml
+docker-compose.local.yml
+docker-compose.amit.yml
+secrets/postgres_password_al.txt
+webroot/files/document_files/
+webroot/email-templates-extracted/
+webroot/tt.html
+webroot/templates.html
+
+# Local secrets — never commit
+secrets/*.txt
+
+# Internal engineering artifacts: bug reports, PR reviews and changelogs that
+# reference the private enterprise repo, internal ticket ids and client names,
+# and features not shipped in this edition. Delete this rule to publish them.
+docs/

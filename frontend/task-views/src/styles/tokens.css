@@ -1,0 +1,262 @@
+/*
+ * Task Views design tokens.
+ *
+ * One typeface: IBM Plex Sans. Hierarchy comes from weight, size, tracking and
+ * case — never from a second family. The `tnum` feature is on globally so IDs,
+ * dates and estimates align in a column without a monospace face.
+ */
+
+/* The @font-face rules live in webroot/css/typography.css, which the host page
+   loads app-wide — this bundle must not ship a second copy of the same files.
+   The dev harness gets them through the /font proxy in vite.config.js. */
+
+:root {
+    /* ---- Type ---- */
+    --tv-font: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --tv-size-title: 20px;
+    --tv-size-body: 13px;
+    --tv-size-meta: 12px;
+    --tv-size-label: 11px;
+
+    /* ---- Surface ---- */
+    --tv-paper: #ffffff;
+    --tv-sub: #f6f7f9;
+    --tv-sub-2: #eef0f3;
+    --tv-rule: #e3e6ea;
+    --tv-rule-strong: #d2d7dd;
+    /* Subtask tree rails. Solid rather than dashed — a dashed 1px line makes the
+       eye interpolate across the gaps and sub-pixels away at fractional zoom, so
+       solid reads better while sitting lighter. Indentation carries the
+       hierarchy; this only reinforces it. */
+    --tv-tree-guide: #aab1ba;
+
+    /* ---- Ink ---- */
+    --tv-ink: #14161a;
+    --tv-ink-2: #454b54;
+    --tv-muted: #6e7681;
+    --tv-faint: #949ba4;
+
+    /* ---- Brand: interactive state only. Never used for data. ----
+       Follows the app's active theme. Each theme file (custom_theme-*.css)
+       sets --primary on :root, and the legacy primary buttons paint from it —
+       so deriving from it keeps this app in step when the user switches theme
+       instead of staying orange. The literal is the fallback for any context
+       where a theme file is not loaded. */
+    --tv-brand: var(--primary, #e2600d);
+    --tv-brand-soft: color-mix(in srgb, var(--tv-brand) 10%, #ffffff);
+    --tv-brand-ring: color-mix(in srgb, var(--tv-brand) 32%, transparent);
+
+    /* ---- Status: the only other colour in the system ---- */
+    --tv-st-new: #3d7edb;
+    --tv-st-resolved: #EF6807;
+    --tv-st-progress: #c77800;
+    --tv-st-done: #2f8f5b;
+    --tv-st-canceled: #c4453c;
+
+    /* ---- Geometry ---- */
+    --tv-radius: 4px;
+    --tv-radius-lg: 6px;
+    --tv-rail: 3px;
+
+    --tv-row-inline: 44px;
+    --tv-row-sheet: 30px;
+    --tv-row-table: 40px;
+
+    --tv-shadow-pop: 0 4px 16px rgba(20, 22, 26, 0.1), 0 0 0 1px var(--tv-rule);
+}
+
+/* Scope everything. The host app has global input/table rules that would
+   otherwise bleed in — same reason scrum_isolation.css exists. */
+#taskViewsApp {
+    font-family: var(--tv-font);
+    font-size: var(--tv-size-body);
+    font-feature-settings: "tnum" 1, "cv05" 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--tv-ink);
+    background: var(--tv-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+#taskViewsApp *,
+#taskViewsApp *::before,
+#taskViewsApp *::after {
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+/* Vuetify teleports menu and dialog content into `.v-overlay-container`, which
+   lives outside #taskViewsApp — so it inherits nothing from the block above and
+   would fall back to Vuetify's Roboto. Every dropdown in the page renders here,
+   so this is what actually keeps the type consistent. */
+.v-overlay-container,
+.v-overlay-container * {
+    font-family: var(--tv-font) !important;
+    box-sizing: border-box;
+}
+
+.v-overlay-container {
+    font-size: var(--tv-size-body);
+    font-feature-settings: "tnum" 1, "cv05" 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--tv-ink);
+}
+
+/* Material icon ligatures must keep their own face or they render as words. */
+.v-overlay-container .v-icon,
+.v-overlay-container .mdi::before,
+#taskViewsApp .v-icon,
+#taskViewsApp .mdi::before {
+    font-family: "Material Design Icons" !important;
+}
+
+/* The utility role — column heads, eyebrows, counts. Same family, earned its
+   distinction through case and tracking. */
+#taskViewsApp .tv-label {
+    font-size: var(--tv-size-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tv-muted);
+}
+
+#taskViewsApp .tv-title {
+    font-size: var(--tv-size-title);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+#taskViewsApp .tv-meta {
+    font-size: var(--tv-size-meta);
+    color: var(--tv-muted);
+}
+
+#taskViewsApp .tv-id {
+    font-weight: 500;
+    color: var(--tv-muted);
+    white-space: nowrap;
+}
+
+/* ---- The signature: status rail ----
+   A 3px left edge on every row, in all three views. Constant across the
+   product; carries status during vertical scanning. */
+#taskViewsApp .tv-rail {
+    position: relative;
+}
+
+/*
+ * `:not(tr)` is load-bearing. A ::before on a <tr> is laid out as an anonymous
+ * table cell, which took column 0 and shifted every real cell one column to the
+ * right — the header said "Title" while the row underneath showed the status.
+ * Table rows get the same rail from a border on their first cell instead.
+ */
+#taskViewsApp .tv-rail:not(tr)::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: var(--tv-rail);
+    background: var(--rail-color, transparent);
+}
+
+#taskViewsApp tr.tv-rail > td:first-child {
+    border-inline-start: var(--tv-rail) solid var(--rail-color, transparent);
+}
+
+#taskViewsApp .st-new { --rail-color: var(--tv-st-new); }
+#taskViewsApp .st-in_progress { --rail-color: var(--tv-st-progress); }
+#taskViewsApp .st-resolved { --rail-color: var(--tv-st-resolved); }
+#taskViewsApp .st-closed { --rail-color: var(--tv-st-done); }
+
+/* ---- Task link ----
+   The one way into task detail. Underline only on hover so a dense list does
+   not read as a wall of rules, but it stays a real <a> so middle-click and
+   open-in-new-tab work. */
+#taskViewsApp .tv-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#taskViewsApp .tv-link:hover {
+    color: var(--tv-brand);
+    text-decoration: underline;
+}
+
+/* ---- Shared list grid ----
+   CompactRow and ListHeader must line up exactly, and they are separate
+   components with scoped styles — so the track sizes live here, in one place,
+   rather than being duplicated (and drifting) in each component.
+
+   Every column is always present. Pages that have nothing to put in the
+   expand cell render it empty instead of collapsing the track, because a
+   per-page grid would mean a per-page header to match it. */
+#taskViewsApp .tv-lrow {
+    display: grid;
+    grid-template-columns:
+        26px                    /* expand chevron */
+        32px                    /* select checkbox */
+        84px                    /* task ref */
+        minmax(200px, 1fr)      /* title */
+        132px                   /* type */
+        132px                   /* assignee */
+        148px                   /* status */
+        104px                   /* priority */
+        40px;                   /* row actions */
+    align-items: center;
+    gap: 10px;
+    padding-inline: 0 20px;
+}
+
+#taskViewsApp .tv-lhead {
+    background: var(--tv-sub);
+    border-block-end: 1px solid var(--tv-rule);
+    min-block-size: 36px;
+}
+
+/* Sort control in a list header — matches the table view's affordance. */
+#taskViewsApp .tv-sortbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+}
+
+#taskViewsApp .tv-sortbtn:hover {
+    color: var(--tv-ink);
+}
+
+@media (max-width: 860px) {
+    #taskViewsApp .tv-lrow {
+        grid-template-columns: 26px 32px minmax(0, 1fr) 120px 40px;
+    }
+
+    #taskViewsApp .tv-lrow > .tv-lcol--type,
+    #taskViewsApp .tv-lrow > .tv-lcol--id,
+    #taskViewsApp .tv-lrow > .tv-lcol--assignee,
+    #taskViewsApp .tv-lrow > .tv-lcol--pri {
+        display: none;
+    }
+}
+
+/* ---- Focus: one visible treatment everywhere ---- */
+#taskViewsApp :focus-visible {
+    outline: 2px solid var(--tv-brand);
+    outline-offset: -1px;
+    border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #taskViewsApp *,
+    #taskViewsApp *::before,
+    #taskViewsApp *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
