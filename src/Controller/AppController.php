@@ -847,7 +847,7 @@ class AppController extends Controller
             if ($projOwnAdmin) {
                 array_unshift($projOwnAdmin, $temp_array);
             } else {
-                $projOwnAdmin = $temp_array;
+                $projOwnAdmin = [$temp_array];
             }
         }
         $GLOBALS['projOwnAdmin'] = $projOwnAdmin;

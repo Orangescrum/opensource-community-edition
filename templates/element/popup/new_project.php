@@ -458,8 +458,8 @@ use Cake\Core\Configure;
                                                 class="proj_mem_chk" onclick="addremoveadmin(this)"
                                                 value="<?php echo $usr['User']['id']; ?>" />
                                             <span class="oya-blk" id="puser<?php echo $usr['User']['id']; ?>">
-                                                <span title="<?php echo h($usr['User']['name']); ?>" rel="tooltip">
-                                                    <?php echo $this->Text->truncate(h($usr['User']['name']), 16, ['ellipsis' => '...', 'exact' => true]); ?>
+                                                <span title="<?php echo h($usr['User']['name'] ?? ''); ?>" rel="tooltip">
+                                                    <?php echo $this->Text->truncate(h((string)($usr['User']['name'] ?? '')), 16, ['ellipsis' => '...', 'exact' => true]); ?>
                                                 </span>
                                                 <?php if ($usr['CompanyUser']['user_type'] == 1) { ?>
                                                     <small class="green-txt">(owner)</small>
@@ -504,9 +504,9 @@ use Cake\Core\Configure;
                     $chk_cnt = 0;
                     foreach ($allUsers as $k => $v) {
                         $chk_cnt = 1;
-                        $name = $v['name'];
-                        if (trim($v['name']) == '') {
-                            $t_name = explode('@', $v['email']);
+                        $name = (string)($v['name'] ?? '');
+                        if (trim($name) == '') {
+                            $t_name = explode('@', (string)($v['email'] ?? ''));
                             $name = $t_name[0];
                         }
                         $place_holder = '';
