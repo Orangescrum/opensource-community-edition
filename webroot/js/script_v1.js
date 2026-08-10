@@ -5138,14 +5138,27 @@ function projectAdd(txtProj, shortname, txtstart, txtend, txtesthr, loader, btn)
                             //document.projectadd.submit();
                             return true;
                         }
-                    }, 'json');
+                    }, 'json').fail(function () {
+                        // Without this the dialog spins forever whenever the
+                        // check cannot be reached.
+                        $('#' + loader).hide();
+                        $('#' + btn).show();
+                        $('#err_mem_email').show().html(_("Could not check the member email addresses. Please try again."));
+                        $('#members_list').focus();
+                        $("#btn-add-new-project").show().addClass('loginactive');
+                    });
                 } else {
                     form.submit();
                     //document.projectadd.submit();
                     return true;
                 }
             }
-        }, 'json');
+        }, 'json').fail(function () {
+            $('#' + loader).hide();
+            $('#' + btn).show();
+            $('#err_msg').show().html(_("Could not create the project. Please try again."));
+            $("#btn-add-new-project").show().addClass('loginactive');
+        });
         return false;
     }
     return false;

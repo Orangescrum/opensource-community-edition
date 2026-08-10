@@ -1,7 +1,7 @@
 <?php
 
 define('RELEASE', 4);
-define('ASSET_RELEASE', '80'); // Change asset release on every css/js change
+define('ASSET_RELEASE', '81'); // Change asset release on every css/js change
 define('RELEASE_VESION', 'v0.1.0');
 define('RELEASE_VERSION', 'v0.1.0');
 define('SHOW_ARABIC', 0);

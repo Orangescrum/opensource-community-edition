@@ -4508,13 +4508,17 @@ class UsersController extends AppController
                         ]);
                 })
                 ->where([
-                    'Users.email IS NOT NULL',
+                    // Key/value form, not a raw string: PostgreSQL case-folds an
+                    // unquoted `Users` to `users`, which does not match the quoted
+                    // alias, and the query dies with "invalid reference to
+                    // FROM-clause entry".
+                    'Users.email IS NOT' => null,
                     'Users.email IN' => $emaillist,
                 ])
                 ->toArray();
             if (!empty($userlist)) {
                 $retArr['status'] = 0;
-                $retArr['users'] = implode(',', $userlist);
+                $retArr['users'] = implode(',', array_column($userlist, 'email'));
             } else {
                 $retArr['status'] = 1;
             }
