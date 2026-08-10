@@ -265,6 +265,12 @@
                             $('#tlcnt_btn').prop('disabled', false);
                             $('#tlcnt_btn').removeClass('cmn_disabled_btn');
                         }
+                    },
+                    error: function () {
+                        // Without this the spinner never clears and Continue stays
+                        // disabled, which reads as a frozen page.
+                        $('#tloader_img_csv').hide();
+                        $('#err_span').html('<?php echo __('Could not check the file. Please try again.');?><br/>');
                     }
                 });
             } else {

@@ -329,6 +329,12 @@
                             $('#cnt_btn').prop('disabled', false);
                             $('#cnt_btn').removeClass('cmn_disabled_btn');
                         }
+                    },
+                    error: function () {
+                        // Without this the spinner never clears and Continue stays
+                        // disabled, which reads as a frozen page.
+                        $('#loader_img_csv').hide();
+                        $('#err_span').html('<?php echo __('Could not check the file. Please try again.');?><br/>');
                     }
                 });
             } else {
@@ -514,6 +520,10 @@
                         window.location = HTTP_ROOT + 'projects/importexport';
                     }, 6000);
                 }
+            },
+            error: function () {
+                $('#loader_img_csv').hide();
+                $('#err_span').html('<?php echo __('Could not check the file. Please try again.');?><br/>');
             }
         });
     }

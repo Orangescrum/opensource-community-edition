@@ -1,3 +1,5 @@
 Project Name,Task#,Assigned To,Description,Date,Hours,Start Time,End Time,Break Time,Is Billable
-Power Sector ,2,support@orangescrum.com,,10/13/2016,02:45,,,,1
-Weekly Deals,1,support@orangescrum.com,Choose plan and complete registration process with braintree implementation,10/14/2016,,3:00pm,6:50pm,01:05,0
+Getting Started Orangescrum,1,owner@example.com,Set up the project workspace and invited the team.,1/5/2026,04:00,,,,1
+Getting Started Orangescrum,2,owner@example.com,Configured the task statuses for the workflow.,1/12/2026,,2:00pm,5:00pm,00:15,1
+Getting Started Orangescrum,3,owner@example.com,Added the custom statuses.,1/13/2026,02:00,,,,0
+Getting Started Orangescrum,4,owner@example.com,Prepared the task list for import.,1/19/2026,,9:30am,11:00am,00:00,0
