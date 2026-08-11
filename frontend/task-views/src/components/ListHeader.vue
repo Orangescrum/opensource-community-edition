@@ -1,5 +1,6 @@
 <script setup>
 import { useTaskStore } from "@/store/useTaskStore";
+import { useListColumns } from "@/composables/useListColumns";
 
 /**
  * Column header for the CompactRow-based lists (Subtask View, My Works).
@@ -20,6 +21,7 @@ const props = defineProps({
 const emit = defineEmits(["toggle-expand-all"]);
 
 const store = useTaskStore();
+const { shows, listStyle } = useListColumns();
 
 const COLS = [
     { key: "id", label: "Task", cls: "tv-lcol--id" },
@@ -47,7 +49,7 @@ function toggleAll() {
 </script>
 
 <template>
-    <div class="tv-lrow tv-lhead lh">
+    <div class="tv-lrow tv-lhead lh" :style="listStyle">
         <span class="lh__exp">
             <button
                 v-if="expandable"
@@ -71,7 +73,7 @@ function toggleAll() {
             />
         </label>
 
-        <span v-for="c in COLS" :key="c.key" class="tv-lcol" :class="c.cls">
+        <span v-for="c in COLS.filter((x) => shows(x.key))" :key="c.key" class="tv-lcol" :class="c.cls">
             <button type="button" class="tv-sortbtn tv-label" @click="store.toggleSort(c.key)">
                 {{ c.label }}
                 <v-icon :icon="sortIcon(c.key)" size="13" aria-hidden="true" />

@@ -332,3 +332,11 @@ export async function archiveTasks(tasks) {
         if (data?.status !== "success") throw new Error("Could not archive those tasks.");
     }
 }
+
+/**
+ * Store one piece of per-user UI state on the server. The whitelist of keys
+ * lives in TaskViewsController; anything else is rejected.
+ */
+export async function savePreference(key, value) {
+    await post("task-views/save-preference", { key, value: JSON.stringify(value) });
+}

@@ -17,6 +17,7 @@ import {
     saveEstimate,
     saveStatusBulk,
     saveTaskType,
+    savePreference,
 } from "@/data/mutations";
 import { taskTypes } from "@/data/taskTypes";
 import { toServerFilters } from "@/data/serverFilters";
@@ -106,6 +107,38 @@ function saveSort(sortBy, sortDir) {
 }
 
 /**
+ * Column visibility is held per user on the SERVER, not in localStorage: a
+ * layout set at a desk should still be there on a laptop, and it must survive
+ * a cleared browser. The page ships the saved value inside TASK_VIEWS_CONFIG,
+ * so the first paint already has the right columns — fetching it would render
+ * the defaults and then visibly rearrange them.
+ */
+const COLUMNS_KEY = "taskViews.hiddenColumns";
+
+function loadHiddenColumns() {
+    const saved = window.TASK_VIEWS_CONFIG?.preferences?.[COLUMNS_KEY];
+
+    return new Set(Array.isArray(saved) ? saved.filter((k) => typeof k === "string") : []);
+}
+
+/** Module-level so it never becomes reactive state. */
+let columnsSaveTimer = null;
+
+function saveHiddenColumns(hidden) {
+    clearTimeout(columnsSaveTimer);
+
+    // Ticking several boxes while the menu is open is one intent, so coalesce
+    // it into a single write instead of one request per click.
+    columnsSaveTimer = setTimeout(() => {
+        savePreference(COLUMNS_KEY, [...hidden]).catch(() => {
+            // The columns are already applied. A failed write only costs the
+            // user the layout on their next visit, which is not worth a banner
+            // over the list they are reading.
+        });
+    }, 400);
+}
+
+/**
  * One store behind all three views. Filters, sort, selection and column
  * visibility live here so switching view keeps your place — that is what makes
  * the three read as one product rather than three widgets.
@@ -176,7 +209,7 @@ export const useTaskStore = defineStore("tasks", {
         serverSorted: false,
 
         selected: new Set(),
-        hiddenColumns: new Set(),
+        hiddenColumns: loadHiddenColumns(),
 
         /**
          * Subtask view. Holds the parents the user has *collapsed* rather than
@@ -960,6 +993,7 @@ export const useTaskStore = defineStore("tasks", {
             if (this.hiddenColumns.has(key)) this.hiddenColumns.delete(key);
             else this.hiddenColumns.add(key);
             this.hiddenColumns = new Set(this.hiddenColumns);
+            saveHiddenColumns(this.hiddenColumns);
         },
 
         toggleSelect(id) {

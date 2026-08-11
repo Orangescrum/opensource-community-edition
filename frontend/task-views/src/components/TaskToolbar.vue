@@ -217,7 +217,7 @@ const createdLabel = computed(() => {
                     <span class="tv-pop__box" :class="{ 'is-on': !store.hiddenColumns.has(c.key) }">
                         <v-icon v-if="!store.hiddenColumns.has(c.key)" icon="mdi-check" size="11" />
                     </span>
-                    <span>{{ c.label }}</span>
+                    <span>{{ c.menuLabel ?? c.label }}</span>
                 </button>
             </div>
         </v-menu>

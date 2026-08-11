@@ -42,6 +42,12 @@ export const PRIORITIES = [
 export const priorityColor = (value) =>
     PRIORITIES.find((p) => p.value === value)?.color ?? "inherit";
 
+/**
+ * `label` heads the column and is kept short because the track is narrow.
+ * `menuLabel` is what the Columns menu shows: the menu has the room, and a
+ * reader picking columns from a list needs the whole name — "Est." on its own
+ * does not say what it is.
+ */
 export const COLUMNS = [
     { key: "id", label: "Task", width: 104, always: true },
     { key: "title", label: "Title", width: null, always: true },
@@ -49,8 +55,8 @@ export const COLUMNS = [
     { key: "status", label: "Status", width: 148 },
     { key: "priority", label: "Priority", width: 108 },
     { key: "assignee", label: "Assignee", width: 132 },
-    { key: "due", label: "Due", width: 96 },
-    { key: "estimate", label: "Est.", width: 68 },
+    { key: "due", label: "Due", menuLabel: "Due date", width: 96 },
+    { key: "estimate", label: "Est.", menuLabel: "Estimated hours", width: 68 },
 ];
 
 /**

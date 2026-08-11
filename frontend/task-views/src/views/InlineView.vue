@@ -9,21 +9,32 @@ import PriorityGlyph from "@/components/PriorityGlyph.vue";
 import TaskTypeBadge from "@/components/TaskTypeBadge.vue";
 import { taskHref, openTask } from "@/utils/taskLink";
 import GroupHeader from "@/components/GroupHeader.vue";
+import { computed } from "vue";
 
 const store = useTaskStore();
 const pager = usePagedGroups(store);
 
 /**
- * Header labels for the inline grid. The tracks are declared once in .iv__grid
- * and shared by the header and every row, so the two cannot drift.
+ * Header labels for the inline grid, with the track each one occupies. The
+ * tracks are handed to .iv__grid as a custom property and shared by the header
+ * and every row, so the two cannot drift — and so unticking a column in the
+ * Columns menu removes its track here rather than leaving an empty gap.
+ *
+ * Type and Assignee have no track: they sit on the sub-line under the title.
  */
 const COLS = [
-    { key: "id", label: "Task", cls: "iv__h-id" },
-    { key: "title", label: "Title", cls: null },
-    { key: "status", label: "Status", cls: null },
-    { key: "priority", label: "Priority", cls: null },
-    { key: "due", label: "Due", cls: "iv__h-due" },
+    { key: "id", label: "Task", cls: "iv__h-id", track: "88px" },
+    { key: "title", label: "Title", cls: null, track: "minmax(220px, 1fr)" },
+    { key: "status", label: "Status", cls: null, track: "140px" },
+    { key: "priority", label: "Priority", cls: null, track: "108px" },
+    { key: "due", label: "Due", cls: "iv__h-due", track: "92px" },
 ];
+
+const shows = (key) => !store.hiddenColumns.has(key);
+const visibleCols = computed(() => COLS.filter((c) => shows(c.key)));
+const gridStyle = computed(() => ({
+    "--iv-tracks": `34px ${visibleCols.value.map((c) => c.track).join(" ")}`,
+}));
 
 function sortIcon(key) {
     if (store.sortBy !== key) return "mdi-unfold-more-horizontal";
@@ -34,7 +45,7 @@ function sortIcon(key) {
 
 <template>
     <div class="iv">
-        <div class="iv__grid iv__head">
+        <div class="iv__grid iv__head" :style="gridStyle">
             <label class="iv__pick">
                 <input
                     type="checkbox"
@@ -44,7 +55,7 @@ function sortIcon(key) {
                     @change="store.toggleSelectAllVisible()"
                 />
             </label>
-            <span v-for="c in COLS" :key="c.key" :class="c.cls">
+            <span v-for="c in visibleCols" :key="c.key" :class="c.cls">
                 <button type="button" class="tv-sortbtn tv-label" @click="store.toggleSort(c.key)">
                     {{ c.label }}
                     <v-icon :icon="sortIcon(c.key)" size="13" aria-hidden="true" />
@@ -60,6 +71,7 @@ function sortIcon(key) {
                 :key="t.id"
                 class="iv__grid iv__row tv-rail"
                 :class="[`st-${t.status}`, { 'is-picked': store.selected.has(t.id) }]"
+                :style="gridStyle"
             >
                 <label class="iv__pick">
                     <input
@@ -83,8 +95,9 @@ function sortIcon(key) {
                         <span v-if="store.spansProjects && t.project" class="iv__proj tv-meta">
                             {{ t.project }}
                         </span>
-                        <TaskTypeBadge :task="t" />
+                        <TaskTypeBadge v-if="shows('type')" :task="t" />
                         <EditableCell
+                            v-if="shows('assignee')"
                             type="select"
                             :model-value="t.assignee"
                             :options="store.assigneeOptions"
@@ -96,7 +109,7 @@ function sortIcon(key) {
                     </div>
                 </div>
 
-                <div class="iv__field iv__field--status">
+                <div v-if="shows('status')" class="iv__field iv__field--status">
                     <EditableCell
                         type="select"
                         :model-value="t.status"
@@ -108,7 +121,7 @@ function sortIcon(key) {
                     </EditableCell>
                 </div>
 
-                <div class="iv__field iv__field--pri">
+                <div v-if="shows('priority')" class="iv__field iv__field--pri">
                     <EditableCell
                         type="select"
                         :model-value="t.priority"
@@ -120,7 +133,7 @@ function sortIcon(key) {
                     </EditableCell>
                 </div>
 
-                <div class="iv__field iv__field--due">
+                <div v-if="shows('due')" class="iv__field iv__field--due">
                     <EditableCell
                         type="date"
                         :model-value="t.due"
@@ -154,10 +167,12 @@ function sortIcon(key) {
     list-style: none;
 }
 
-/* One track declaration, used by the header and every row. */
+/* One track declaration, used by the header and every row. The value comes
+   from --iv-tracks so hidden columns drop their track too; the fallback is the
+   full set. */
 .iv__grid {
     display: grid;
-    grid-template-columns: 34px 88px minmax(220px, 1fr) 140px 108px 92px;
+    grid-template-columns: var(--iv-tracks, 34px 88px minmax(220px, 1fr) 140px 108px 92px);
     align-items: center;
     gap: 10px;
     padding: 4px 20px 4px 0;

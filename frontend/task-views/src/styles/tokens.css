@@ -189,12 +189,16 @@
    components with scoped styles — so the track sizes live here, in one place,
    rather than being duplicated (and drifting) in each component.
 
-   Every column is always present. Pages that have nothing to put in the
-   expand cell render it empty instead of collapsing the track, because a
-   per-page grid would mean a per-page header to match it. */
+   Pages that have nothing to put in the expand cell render it empty instead of
+   collapsing the track, because a per-page grid would mean a per-page header to
+   match it.
+
+   The tracks come from useListColumns() as a custom property so that hiding a
+   column also removes its track — the fallback below is the full set. */
 #taskViewsApp .tv-lrow {
     display: grid;
-    grid-template-columns:
+    grid-template-columns: var(
+        --tv-lrow-tracks,
         26px                    /* expand chevron */
         32px                    /* select checkbox */
         84px                    /* task ref */
@@ -203,7 +207,8 @@
         132px                   /* assignee */
         148px                   /* status */
         104px                   /* priority */
-        40px;                   /* row actions */
+        40px                    /* row actions */
+    );
     align-items: center;
     gap: 10px;
     padding-inline: 0 20px;
@@ -234,7 +239,7 @@
 
 @media (max-width: 860px) {
     #taskViewsApp .tv-lrow {
-        grid-template-columns: 26px 32px minmax(0, 1fr) 120px 40px;
+        grid-template-columns: var(--tv-lrow-tracks-narrow, 26px 32px minmax(0, 1fr) 120px 40px);
     }
 
     #taskViewsApp .tv-lrow > .tv-lcol--type,

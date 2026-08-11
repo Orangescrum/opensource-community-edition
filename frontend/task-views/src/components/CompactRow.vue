@@ -6,6 +6,7 @@ import StatusBadge from "@/components/StatusBadge.vue";
 import PriorityGlyph from "@/components/PriorityGlyph.vue";
 import TaskTypeBadge from "@/components/TaskTypeBadge.vue";
 import { openTask } from "@/utils/taskLink";
+import { useListColumns } from "@/composables/useListColumns";
 
 const props = defineProps({
     task: { type: Object, required: true },
@@ -27,6 +28,7 @@ const props = defineProps({
 const emit = defineEmits(["toggle"]);
 
 const store = useTaskStore();
+const { shows, listStyle } = useListColumns();
 
 const parentRef = computed(() =>
     props.orphaned ? store.refByNumericId.get(props.task.parentId) : null
@@ -46,6 +48,7 @@ function open(e) {
     <div
         class="tv-lrow cr tv-rail"
         :class="[`st-${task.status}`, { 'cr--indent': depth > 0, 'is-picked': store.selected.has(task.id) }]"
+        :style="listStyle"
         tabindex="0"
         role="button"
         @click="open"
@@ -107,10 +110,10 @@ function open(e) {
             <span v-if="expandable && childCount" class="cr__count">{{ childCount }}</span>
         </div>
 
-        <span class="cr__nogo tv-lcol--type"><TaskTypeBadge v-if="task.type" :task="task" /></span>
-        <span class="cr__assignee tv-meta tv-lcol--assignee">{{ task.assignee }}</span>
-        <span class="tv-lcol--status"><StatusBadge :value="task.status" :label="task.statusLabel" /></span>
-        <span class="tv-lcol--pri"><PriorityGlyph :value="task.priority" /></span>
+        <span v-if="shows('type')" class="cr__nogo tv-lcol--type"><TaskTypeBadge v-if="task.type" :task="task" /></span>
+        <span v-if="shows('assignee')" class="cr__assignee tv-meta tv-lcol--assignee">{{ task.assignee }}</span>
+        <span v-if="shows('status')" class="tv-lcol--status"><StatusBadge :value="task.status" :label="task.statusLabel" /></span>
+        <span v-if="shows('priority')" class="tv-lcol--pri"><PriorityGlyph :value="task.priority" /></span>
 
         <span class="cr__actions cr__nogo">
             <v-menu location="bottom end" offset="2">
