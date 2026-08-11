@@ -32,7 +32,12 @@ services:
       # Set to "true" only when served over HTTPS (e.g. behind a TLS proxy).
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-ORANGESCRUM_SESSID}
+      # Leave empty to scope the cookie to the exact host. Set it (with a
+      # leading dot) only to share sessions across subdomains.
+      SESSION_COOKIE_DOMAIN: ${SESSION_COOKIE_DOMAIN:-}
       CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-orangescrum_csrf}
+      # Set to false to remove the in-app upgrade/add-on pages entirely.
+      SHOW_UPGRADE_CTA: ${SHOW_UPGRADE_CTA:-true}
     volumes:
       - orangescrum-app-files:/var/www/html/webroot/files
       - orangescrum-app-config:/var/www/html/config
