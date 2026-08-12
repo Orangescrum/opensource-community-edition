@@ -340,3 +340,21 @@ export async function archiveTasks(tasks) {
 export async function savePreference(key, value) {
     await post("task-views/save-preference", { key, value: JSON.stringify(value) });
 }
+
+/**
+ * Rename a task, through the same endpoint the task-detail page's title editor
+ * uses — so the change lands in the activity feed and the notifications exactly
+ * as it does there.
+ */
+export async function saveTitle(task, title) {
+    const next = (title ?? "").trim();
+    if (!next) throw new Error("A task needs a name.");
+    if (next.length > 240) throw new Error("A task name can have 240 characters at most.");
+
+    const { data } = await post("easycases/saveInlineTitle", {
+        uniq_id: task.id,
+        title: next,
+    });
+    if (data?.status !== "success") throw new Error("Could not save the task name.");
+    return data;
+}

@@ -92,9 +92,14 @@ onBeforeUnmount(() => {
 });
 
 /*
- * Save feedback. A failed write rolls back silently in the store, so without
- * this the user would never learn why their change vanished; successes that
- * views announce (kanban drops) show the same way.
+ * Success feedback. A brief toast is right for "that worked" — it needs no
+ * action and should not stay in the way.
+ *
+ * Failures do NOT come through here. A rolled-back edit is a message the user
+ * has to read and act on, and a toast at the foot of the page, gone in three
+ * and a half seconds, is the wrong place for it (public issue #2). Those go to
+ * the banner below, which sits directly above the rows and waits to be
+ * dismissed.
  */
 const toast = ref(null);
 let toastTimer = null;
@@ -105,7 +110,6 @@ function showToast(text, tone) {
     toastTimer = setTimeout(() => (toast.value = null), 3500);
 }
 
-watch(() => store.saveError, (e) => { if (e) { showToast(e, "error"); store.saveError = null; } });
 watch(() => store.notice, (n) => { if (n) { showToast(n, "ok"); store.notice = null; } });
 
 function reload() {
@@ -190,6 +194,21 @@ onBeforeUnmount(() => {
         </header>
 
         <TaskToolbar v-if="showToolbar" />
+
+        <!-- Directly above the list, so it is beside the row that was edited
+             rather than at the foot of the page. It stays until dismissed. -->
+        <div v-if="store.saveError" class="tv-savefail" role="alert">
+            <v-icon icon="mdi-alert-circle-outline" size="15" aria-hidden="true" />
+            <span>{{ store.saveError }}</span>
+            <button
+                type="button"
+                class="tv-savefail__x"
+                aria-label="Dismiss"
+                @click="store.dismissSaveError()"
+            >
+                <v-icon icon="mdi-close" size="13" />
+            </button>
+        </div>
 
         <transition name="tv-toast">
             <div v-if="toast" class="tv-toast" :class="`tv-toast--${toast.tone}`" role="status">
@@ -300,6 +319,30 @@ onBeforeUnmount(() => {
 /* Painted from --tv-brand rather than Vuetify's compiled primary so it tracks
    a theme change in the page, not just the value read when the app booted.
    White label matches the app's own primary buttons. */
+.tv-savefail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: #fdecea;
+    border-block-end: 1px solid #f5c6cb;
+    font-size: var(--tv-size-meta);
+    color: #8a1f16;
+}
+
+.tv-savefail__x {
+    margin-inline-start: auto;
+    display: grid;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 22px;
+    border: 0;
+    border-radius: var(--tv-radius);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
 .tv-toast {
     position: fixed;
     inset-block-end: 24px;

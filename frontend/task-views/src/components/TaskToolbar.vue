@@ -340,14 +340,6 @@ const createdLabel = computed(() => {
     />
 
     <!-- A failed write already rolled the row back; this says why. -->
-    <div v-if="store.saveError" class="tv-savefail">
-        <v-icon icon="mdi-alert-circle-outline" size="15" aria-hidden="true" />
-        <span>{{ store.saveError }}</span>
-        <button type="button" class="tv-savefail__x" aria-label="Dismiss" @click="store.dismissSaveError()">
-            <v-icon icon="mdi-close" size="13" />
-        </button>
-    </div>
-
 </template>
 
 <style scoped>
@@ -425,29 +417,7 @@ const createdLabel = computed(() => {
     color: var(--tv-ink);
 }
 
-.tv-savefail {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 20px;
-    background: #fdecea;
-    border-block-end: 1px solid #f5c6cb;
-    font-size: var(--tv-size-meta);
-    color: #8a1f16;
-}
 
-.tv-savefail__x {
-    margin-inline-start: auto;
-    display: grid;
-    place-items: center;
-    inline-size: 22px;
-    block-size: 22px;
-    border: 0;
-    border-radius: var(--tv-radius);
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-}
 
 .tv-savefail__x:hover {
     background: rgba(138, 31, 22, 0.12);

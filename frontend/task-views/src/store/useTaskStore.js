@@ -17,6 +17,7 @@ import {
     saveEstimate,
     saveStatusBulk,
     saveTaskType,
+    saveTitle,
     savePreference,
 } from "@/data/mutations";
 import { taskTypes } from "@/data/taskTypes";
@@ -1043,7 +1044,8 @@ export const useTaskStore = defineStore("tasks", {
             this.lastEditedId = id;
 
             const save =
-                field === "status" ? saveStatus
+                field === "title" ? saveTitle
+                : field === "status" ? saveStatus
                 : field === "priority" ? savePriority
                 : field === "type" ? ((t, v) => saveTaskType(t, taskTypes().find((x) => x.name === v)))
                 : field === "estimate" ? saveEstimate
