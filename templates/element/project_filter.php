@@ -164,16 +164,40 @@ $selectedProjectManager = isset($_GET['project_manager']) ? $_GET['project_manag
 ?>
 
 <script>
+    /*
+     * Every checkbox in this panel navigates the page (see the PROJECTMANAGE*
+     * handlers in script_v1.js), so the panel is rebuilt from scratch each time
+     * a filter is ticked. keepFilterModalOpen already reopened the modal, but
+     * every accordion section is markup-closed, so the section being used
+     * closed on every tick and had to be reopened by hand (public issue #7).
+     * Remember which one was open and reopen it too.
+     */
+    var OPEN_SECTION_KEY = 'openFilterSection';
+
+    // Set only on the load that follows a filter click, and consumed by the
+    // modal's shown handler — expanding a section before the modal has finished
+    // opening does nothing.
+    var sectionToReopen = null;
+
     document.addEventListener('DOMContentLoaded', function () {
         if (localStorage.getItem('keepFilterModalOpen') === 'true') {
-            $('#filterModal').modal('show');
             localStorage.removeItem('keepFilterModalOpen');
+            sectionToReopen = localStorage.getItem(OPEN_SECTION_KEY);
+            $('#filterModal').modal('show');
         }
     });
 
     const selectedProjectManager = "<?= $selectedProjectManager ?>";
     $(document).ready(function() {
         $('#filterModal').on('shown.bs.modal', function() {
+            if (sectionToReopen && document.getElementById(sectionToReopen)) {
+                $('#' + sectionToReopen).collapse('show');
+                $('[data-target="#' + sectionToReopen + '"]')
+                    .removeClass('collapsed')
+                    .attr('aria-expanded', 'true');
+            }
+            sectionToReopen = null;
+
             $(this).find('select').each(function() {
                 $(this).select2({
                     width: '100%',
@@ -184,7 +208,22 @@ $selectedProjectManager = isset($_GET['project_manager']) ? $_GET['project_manag
         });
         $('#filterModal').on('hidden.bs.modal', function() {
             $(this).find('select').select2('destroy');
+            // Closing the panel ends the run of filtering, so the next visit
+            // opens with no section forced open.
+            localStorage.removeItem(OPEN_SECTION_KEY);
         });
+
+        $('#filterAccordion')
+            .on('shown.bs.collapse', '.collapse', function() {
+                localStorage.setItem(OPEN_SECTION_KEY, this.id);
+            })
+            .on('hidden.bs.collapse', '.collapse', function() {
+                // Only when this section is the one on record: the accordion
+                // closes the previous section after it opens the new one.
+                if (localStorage.getItem(OPEN_SECTION_KEY) === this.id) {
+                    localStorage.removeItem(OPEN_SECTION_KEY);
+                }
+            });
         $.ajax({
             url: HTTP_ROOT + "projects/ajaxProjectTypeFilter",
             type: 'POST',

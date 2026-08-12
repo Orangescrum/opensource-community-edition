@@ -111,9 +111,41 @@ $legacyList = null;
      * The Create Task popup carries margin:-100px (custom.css) to sit under the
      * dashboard's taller header. These pages do not render that header, so the
      * negative pull lifted the popup above the navbar and against the browser
-     * chrome. Give it an ordinary gap instead.
+     * chrome.
+     *
+     * It is also an ordinary block in the page flow while its backdrop
+     * (.crttask_overlay) is fixed, so scrolling the page slid the form up under
+     * the fixed navbar, where it could not be read or reached (public issue #9).
+     * Anchor it to the viewport below the navbar and let it scroll inside
+     * itself. 96px is where it already sat, so the popup looks unchanged until
+     * you scroll.
      */
     body.page-taskviews .create-task-container {
-        margin-top: 16px !important;
+        position: fixed;
+        top: 96px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        margin: 0 !important;
+        z-index: 1000;
+    }
+
+    /*
+     * The close button hangs 45px outside the card, which the scroll box above
+     * would cut off. Bring it inside — and darken it, because outside it sat on
+     * the dimmed backdrop and inside it sits on white.
+     */
+    body.page-taskviews .crt_tsk .crt_popup_close {
+        right: 4px;
+        top: 4px;
+    }
+
+    body.page-taskviews .crt_tsk .crt_popup_close .close .material-icons {
+        color: #666;
+    }
+
+    body.page-taskviews .crt_tsk .crt_popup_close .close:hover .material-icons {
+        color: #d32f2f;
     }
 </style>

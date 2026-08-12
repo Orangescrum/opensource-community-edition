@@ -37,7 +37,11 @@ async function onDrop(col) {
     // The store rolls the card back and sets saveError on failure; App.vue
     // surfaces both, so the drop is never silent either way.
     if (!store.saveError && task) {
-        store.notice = `${task.ref} moved to ${col.label}`;
+        // The name, not the reference: "#16 moved to Closed" makes the reader
+        // look the number up again (public issue #4). Long titles are cut so
+        // the message stays on one line.
+        const name = (task.title || "").trim() || task.ref;
+        store.notice = `${name.length > 60 ? `${name.slice(0, 59)}…` : name} moved to ${col.label}`;
     }
 }
 </script>
