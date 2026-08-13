@@ -4496,6 +4496,13 @@ class UsersController extends AppController
             } elseif ($emailids) {
                 $emaillist[] = $emailids;
             }
+            // Nothing to check. Without this the query below builds `IN ()`,
+            // which PostgreSQL rejects, and the caller gets a 503 telling it
+            // the database is unreachable.
+            if ($emaillist === []) {
+                return $this->jsonResponse(json_encode(['status' => 1]));
+            }
+
             $userlist = $this->Users->find()
                 ->select(['id', 'email'])
                 ->disableHydration()
