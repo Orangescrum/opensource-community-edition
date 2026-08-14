@@ -5712,9 +5712,11 @@ function makeShortName(str) {
     str = str.trim();
     str_temp = str;
     if (str != '') {
-        if ($('#txt_shortProj').val().trim().length >= 5) {
-            return true;
-        }
+        // No length test here. It used to stop regenerating once the short name
+        // reached five characters, which it cannot tell apart from a name the
+        // user typed - so a five-letter generated name froze and never followed
+        // the project name again (public issue #15). short_nm_prj_new below is
+        // the actual signal: it is set only when the user edits the field.
         if ($('#short_nm_prj_new').val() == 1) {
             if ($('#txt_Proj_onboard').length) {
                 $('#txt_shortProj_onboard').val(chr);
