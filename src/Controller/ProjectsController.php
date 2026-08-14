@@ -2445,8 +2445,11 @@ class ProjectsController extends AppController
                     );
                 }
             }
-            $arrJson['status'] = 'success';
-            return $this->response->withStringBody(json_encode($arrJson));
+            // No return here. Taking the project off the invitation is only
+            // half the job: a member who has already accepted also has a
+            // project_users row, and returning at this point skipped the
+            // deletion below, so the member stayed on the project (public
+            // issue #12).
         }
 
         $projectUsersTable = $this->fetchTable('ProjectUsers');
@@ -2509,14 +2512,23 @@ class ProjectsController extends AppController
                     }
                 }
             }
+            // Daily updates are not part of this edition, so the table is
+            // absent and describing it throws ("Cannot describe daily_updates.
+            // It has 0 columns"), which surfaced as a database error to the
+            // caller. Skip the tidy-up when the table is not there.
             $dailyUpdateTable = $this->fetchTable('DailyUpdates');
+            $hasDailyUpdates = in_array(
+                'daily_updates',
+                $this->Projects->getConnection()->getSchemaCollection()->listTables(),
+                true
+            );
 
-            $dailyUpdate = $dailyUpdateTable->find()
+            $dailyUpdate = $hasDailyUpdates ? $dailyUpdateTable->find()
                 ->select(['id', 'user_id'])
                 ->where(['project_id' => $projId])
                 ->disableHydration()
                 ->disableResultsCasting()
-                ->first();
+                ->first() : null;
 
             if (!empty($dailyUpdate)) {
                 $userIds = explode(',', $dailyUpdate['user_id']);
@@ -2532,9 +2544,19 @@ class ProjectsController extends AppController
                     ['id' => $dailyUpdate['id']]
                 );
             }
-
-            return $this->response->withStringBody(json_encode($arrJson));
         }
+
+        // One response for every path. Both callers in script_v1.js test for
+        // 'ok' and then remove the row from the page using these two ids.
+        // The uniq ids, not the numeric ones: the callers use them to find the
+        // row in the page. Anything already set above is left alone.
+        $arrJson['status'] = 'ok';
+        $arrJson += [
+            'user_id' => $detlUser['uniq_id'] ?? null,
+            'proj_id' => $detlProj['uniq_id'] ?? null,
+        ];
+
+        return $this->response->withStringBody(json_encode($arrJson));
     }
 
     public function add_user()
