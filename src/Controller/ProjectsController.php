@@ -1826,9 +1826,19 @@ class ProjectsController extends AppController
                         )
                         ->toArray();
                     if ($compuserlist) {
-                        foreach ($compuserlist as $k1 => $value) {
-                            $postProject['Project']['members'][] = $value;
-                            $removeduserlist[] = $userlist[$value];
+                        // $value is a CompanyUser entity, not an id. Using it as
+                        // an array key threw "Cannot access offset of type
+                        // App\Model\Entity\CompanyUser on array", so creating a
+                        // project with an address that already belongs to a
+                        // member ended in a 500 (public issue #22). $userlist is
+                        // keyed by user id, and everything downstream treats
+                        // members as ids.
+                        foreach ($compuserlist as $value) {
+                            $userId = (int)$value->user_id;
+                            $postProject['Project']['members'][] = $userId;
+                            if (isset($userlist[$userId])) {
+                                $removeduserlist[] = $userlist[$userId];
+                            }
                         }
 
                         foreach ($emailarr as $key1 => $edata) {
