@@ -27,8 +27,14 @@ function post(url, fields) {
  * only a title to become a task.
  */
 export async function quickCreateTask({ title, projectUniqId, taskGroupId = "" }) {
+    // The same 240 the Create Task dialog and the inline rename enforce. Without
+    // it this was the one way into the app that accepted an unbounded title
+    // (public issue #14).
+    const name = (title ?? "").trim();
+    if (name.length > 240) throw new Error("A task name can have 240 characters at most.");
+
     const { data } = await post("easycases/quickTask", {
-        title: (title ?? "").trim(),
+        title: name,
         project_id: projectUniqId,
         type: "inline",
         mid: taskGroupId ? String(taskGroupId) : "",
