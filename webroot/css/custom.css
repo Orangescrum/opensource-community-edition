@@ -7553,3 +7553,11 @@ ul.dropdown-menu.right0.new-dropdown{cursor:pointer}
 .gap-10{gap: 10px;}
 .custom-checkbox-btn{display: flex; align-items: center;gap: 8px;padding: 8px 12px;border-radius: 6px;border: 1px solid rgb(238, 238, 238); cursor: pointer;}
 .checkbox-row{display: flex;grid-template-columns: 1fr 1fr 1fr;gap: 16px;align-items: end;justify-content: start;};
+/* The header dropdowns are all position:relative with z-index:auto and their
+   menus all sit at z-index 1000. Equal z-index means document order decides, and
+   the profile menu comes last, so it covered the theme panel whenever both were
+   showing (public issue #21). The profile menu opens on hover and the theme
+   panel on a click, so the click wins. */
+li.theme_navli > .dropdown-menu {
+    z-index: 1002;
+}
