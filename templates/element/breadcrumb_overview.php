@@ -34,7 +34,7 @@
             <li class="t_entry">
                 <?php
                 $timelogurl = '';
-                $timelogurl = DEFAULT_TIMELOGVIEW == 'calendar_timelog' ? 'calendar_timelog' : 'timelog';
+                $timelogurl = 'timelog';
                 ?>
                 <a class="" href="<?php echo HTTP_ROOT . 'dashboard#' . $timelogurl; ?>" onclick="return checkHashLoad('timelog');"><?php echo __('Time Entry'); ?> (<span id="ov_tim_entry_cnt">0</span>)</a>
             </li>

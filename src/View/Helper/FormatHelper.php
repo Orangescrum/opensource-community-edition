@@ -1531,11 +1531,15 @@ class FormatHelper extends Helper
                 }
                 $returnArr['isAllow'] = true;
 
-                $timelogurl = '';
-                $timelogurl = DEFAULT_TIMELOGVIEW == 'calendar_timelog' ? 'calendar_timelog' : 'timelog';
-                $returnArr['dynamic_url'] = HTTP_ROOT . 'dashboard#/' . $timelogurl;
+                // The seeded menu row still carries the old AngularJS URL
+                // (dashboard#/timelog). That page was removed from this
+                // edition, so it hung on its loading placeholders forever
+                // (public issue #13). Override it here rather than migrate the
+                // menus table, so existing installs are fixed by the upgrade
+                // itself.
+                $returnArr['dynamic_url'] = HTTP_ROOT . 'log-times';
 
-                if ($url == HTTP_ROOT . 'dashboard#/timelog') {
+                if (CONTROLLER == 'log-times' || CONTROLLER == 'logtimes') {
                     $returnArr['active_class'] = 'active ' . $grad;
                 }
 
@@ -1565,12 +1569,7 @@ class FormatHelper extends Helper
                     return null;
                 }
                 $returnArr['isAllow'] = true;
-                $timelogurl = '';
-                $timelogurl = DEFAULT_TIMELOGVIEW == 'calendar_timelog' ? 'calendar_timelog' : 'timelog';
-                $returnArr['dynamic_url'] = HTTP_ROOT . 'dashboard/#' . $timelogurl;
-                if (DEFAULT_TIMELOGVIEW == 'calendar_timelog') {
-                    $returnArr['dynamic_menu_name'] = __('Calender View');
-                }
+                $returnArr['dynamic_url'] = HTTP_ROOT . 'log-times';
 
                 break;
             #########################

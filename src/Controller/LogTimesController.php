@@ -62,6 +62,56 @@ class LogTimesController extends AppController
     }
 
     /**
+     * Time Log, as a list of entries.
+     *
+     * This is the Time Log screen. It reads through fetchLogtimeData(), the
+     * same query the CSV and PDF exports use, so what you see is what you
+     * export.
+     *
+     * The sidebar used to point at an AngularJS page that was removed from
+     * this edition, so Time Log hung on its loading placeholders and never
+     * opened (public issue #13).
+     */
+    public function index()
+    {
+        $data = $this->getRequest()->getQueryParams();
+
+        // Time Log is reached from the sidebar, not from inside a project, so
+        // it opens across every project. Scoping it to whichever project the
+        // user last visited makes the page look empty whenever the hours were
+        // logged somewhere else.
+        $data += ['projuniqid' => 'all', 'date' => 'alldates'];
+
+        $result = $this->fetchLogtimeData($data, [
+            'includeTimezoneInfo' => true,
+            'processForExport' => true,
+        ]);
+
+        $billable = 0;
+        $nonBillable = 0;
+        foreach ($result['logtimes'] as $row) {
+            $hours = (int)($row['LogTime']['total_hours'] ?? 0);
+            if (!empty($row['LogTime']['is_billable'])) {
+                $billable += $hours;
+            } else {
+                $nonBillable += $hours;
+            }
+        }
+
+        $this->set([
+            'caseDetail' => $result['logtimes'],
+            'caseCount' => $result['caseCount'],
+            'projFil' => $result['projFil'],
+            'total_billable_hours' => $billable,
+            'total_non_billable_hours' => $nonBillable,
+            'pageTitle' => __('Time Log'),
+        ]);
+        $this->set($result['timezoneInfo']);
+
+        $this->viewBuilder()->setLayout('default_inner');
+    }
+
+    /**
      * Common function to fetch logtime data with filtering and processing
      * Used by both CSV and PDF export functions
      */
@@ -1070,175 +1120,4 @@ class LogTimesController extends AppController
         return $this->jsonResponse($response);
     }
 
-    public function calendarTimeLog()
-    {
-        $this->viewBuilder()->setLayout('ajax');
-
-        $logTimesTable = $this->fetchTable('LogTimes');
-        $projectsTable = $this->fetchTable('Projects');
-        $projectUsersTable = $this->fetchTable('ProjectUsers');
-        $easycasesTable = $this->fetchTable('Easycases');
-
-        $calanderView = $this->request->getData('calander_view') ?? 'month';
-        $projFil = trim((string)$this->request->getData('projFil', ''));
-        // Normalize invalid client values like the string 'undefined' or 'null'
-        if (is_string($projFil) && in_array(strtolower($projFil), ['undefined', 'null'], true)) {
-            $projFil = 'all';
-        }
-        $project = $GLOBALS['getallproj'][0]['Project'] ?? null;
-        $prjId = $project['id'] ?? null;
-        $prjUniqueId = $project['uniq_id'] ?? null;
-
-        // Update project ID for user
-        if ($projFil && $prjUniqueId != $projFil) {
-            $project = $projectsTable->find()
-                ->select(['id'])
-                ->where(['uniq_id' => $projFil])
-                ->disableHydration()
-                ->first();
-            $prjId = $project['id'] ?? null;
-            if (empty($prjId)) {
-                // if requested project uniq id doesn't exist, treat as 'all'
-                $projFil = 'all';
-            }
-        }
-
-        if (trim($projFil ?? '') != 'all' && $prjId !== null) {
-            // Update latest visited project info for user
-            $projectUser = $projectUsersTable->find()
-                ->where(['project_id' => $prjId, 'user_id' => SES_ID])
-                ->disableResultsCasting()
-                ->first();
-            if ($projectUser) {
-                $projectUser->dt_visited = new DateTime('now');
-                $projectUsersTable->save($projectUser);
-            }
-        }
-
-        $start_t = $this->Tmzone->convert_to_utc(SES_TIMEZONE, TZ_GMT, TZ_DST, TZ_CODE, $this->request->getData('chk_start'), 'datetime');
-        $end_t = $this->Tmzone->convert_to_utc(SES_TIMEZONE, TZ_GMT, TZ_DST, TZ_CODE, $this->request->getData('chk_end'), 'datetime');
-
-        // Filter conditions
-        $filterCond = [];
-        if ($this->request->getData('is_cnt')) {
-            $viewType = trim($this->request->getData('view_typ'));
-            $filterCond = ($viewType === 'agendaDay')
-                ? ['LogTimes.start_datetime >=' => $start_t, 'LogTimes.start_datetime <' => $end_t]
-                : ['LogTimes.start_datetime >=' => $start_t, 'LogTimes.start_datetime <=' => $end_t];
-        }
-
-        // User condition for access control
-        $userCond = [];
-        if ((SES_TYPE == 3) && !$this->Format->isAllowed('View All Timelog', $this->roleAccess)) {
-            $userCond = ['LogTimes.user_id' => SES_ID];
-        }
-
-        // Define query for billable and non-billable hours
-
-        $countQuery = $logTimesTable->find();
-        $countQuery->select([
-            'secds' => $countQuery->func()->sum(
-                $countQuery->identifier('LogTimes.total_hours')
-            ),
-            'is_billable' => $countQuery->identifier('LogTimes.is_billable'),
-        ]);
-        $countQuery->join([
-            'table' => 'easycases',
-            'alias' => 'Easycases',
-            'type' => 'LEFT',
-            'conditions' => [
-                fn($exp) => $exp->equalFields('Easycases.id', 'LogTimes.task_id'),
-                fn($exp) => $exp->equalFields('Easycases.project_id', 'LogTimes.project_id'),
-                'Easycases.isactive' => EasycasesTable::IS_ACTIVE,
-            ],
-        ]);
-        $countQuery->where(['LogTimes.is_billable IN' => [1, 0]]);
-        $countQuery->andWhere($filterCond);
-        $countQuery->andWhere($userCond);
-        $countQuery->group(['LogTimes.project_id', 'LogTimes.is_billable']);
-
-        if ($projFil === 'all') {
-            $countQuery->join([
-                'table' => 'projects',
-                'alias' => 'Projects',
-                'type' => 'LEFT',
-                'conditions' => [
-                    fn($exp) => $exp->equalFields('Projects.id', 'LogTimes.project_id'),
-                    'Projects.company_id' => SES_COMP,
-                ],
-            ]);
-        } else {
-            if ($prjId !== null) {
-                $countQuery->where(['LogTimes.project_id' => $prjId]);
-            } else {
-                // fallback to company-wide projects when prjId is not available
-                $countQuery->join([
-                    'table' => 'projects',
-                    'alias' => 'Projects',
-                    'type' => 'LEFT',
-                    'conditions' => [
-                        fn($exp) => $exp->equalFields('Projects.id', 'LogTimes.project_id'),
-                        'Projects.company_id' => SES_COMP,
-                    ],
-                ]);
-                $countQuery->where(['Projects.isactive' => 1]);
-            }
-        }
-
-        $cntlog = $countQuery->disableHydration()->toArray();
-        $billableHrs = 0;
-        $nonbillableHrs = 0;
-        $totalHrs = 0;
-        foreach ($cntlog as $entry) {
-            $totalHrs += $entry['secds'];
-            if ($entry['is_billable']) {
-                $billableHrs += $entry['secds'];
-            } else {
-                $nonbillableHrs += $entry['secds'];
-            }
-        }
-
-        // Estimated hours query
-        $estQuery = $easycasesTable->find();
-        $estQuery->select([
-            'hrs' => $estQuery->func()->sum(
-                $estQuery->identifier('Easycases.estimated_hours')
-            ),
-        ]);
-        $estQuery->where([
-            'Easycases.isactive' => EasycasesTable::IS_ACTIVE,
-            'Easycases.istype' => EasycasesTable::TYPE_POST,
-        ]);
-        if ($projFil !== 'all' && $prjId !== null) {
-            $estQuery->where(['Easycases.project_id' => $prjId]);
-        } else {
-            $estQuery->join([
-                'table' => 'projects',
-                'alias' => 'Projects',
-                'type' => 'LEFT',
-                'conditions' => [
-                    fn($exp) => $exp->equalFields('Projects.id', 'Easycases.project_id'),
-                    'Projects.company_id' => SES_COMP,
-                ],
-            ]);
-            $estQuery->where(['Projects.isactive' => 1]);
-        }
-        $est = $estQuery->disableHydration()->disableResultsCasting()->first();
-        $estimatedHours = $est['hrs'] ?? 0;
-
-        // Prepare response data
-        $details = [
-            'totalHrs' => $totalHrs,
-            'billableHrs' => $billableHrs,
-            'nonbillableHrs' => $nonbillableHrs,
-            'estimatedHrs' => $estimatedHours,
-            'calander_view' => $calanderView,
-        ];
-
-        // Return JSON if requested
-        if ($this->request->getData('is_cnt')) {
-            return $this->jsonResponse(json_encode($details));
-        }
-        $this->set('data', $details);
-    }
 }

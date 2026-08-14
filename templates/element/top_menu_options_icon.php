@@ -63,7 +63,9 @@
         <?php } ?>
         <?php
         $timelogurl = '';
-        $timelogurl = DEFAULT_TIMELOGVIEW == 'calendar_timelog' ? 'calendar_timelog' : 'timelog';
+        // Time Log is a page of its own now; the AngularJS views it used to
+        // switch between were removed from this edition (public issue #13).
+        $timelogurl = 'timelog';
         ?>
         <li><a id="timelog_btn" class="" href="<?php echo HTTP_ROOT . 'dashboard#' . $timelogurl; ?>"
                 onclick="return checkHashLoad('timelog');">

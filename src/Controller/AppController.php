@@ -978,7 +978,9 @@ class AppController extends Controller
 
         $deftviews = [10 => 'tasks', 11 => 'kanban', 12 => 'taskgroup', 13 => 'milestonelist',];
         $views = [1 => 'tasks', 2 => 'task_group', 14 => 'taskgroups',];
-        $timelogviews = [4 => 'calendar_timelog', 5 => 'timelog'];
+        // The calendar Time Log view was removed from this edition, so every
+        // stored preference resolves to the list (public issue #13).
+        $timelogviews = [4 => 'timelog', 5 => 'timelog'];
         $kanbanviews = [6 => 'milestonelist', 7 => 'kanban'];
         $projectviews = [8 => 'manage', 9 => 'active-grid'];
 
