@@ -36,8 +36,6 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\ProjectsTable&\Cake\ORM\Association\BelongsTo $Projects
  * @property \App\Model\Table\CompaniesTable&\Cake\ORM\Association\BelongsTo $Companies
  * @property \App\Model\Table\EasycasesTable&\Cake\ORM\Association\BelongsTo $Easycases
- * @property \App\Model\Table\DefectsTable&\Cake\ORM\Association\BelongsTo $Defects
- * @property \App\Model\Table\ArchivesTable&\Cake\ORM\Association\HasMany $Archives
  * @property \App\Model\Table\CaseRemovedFilesTable&\Cake\ORM\Association\HasMany $CaseRemovedFiles
  *
  * @method \App\Model\Entity\CaseFile newEmptyEntity()
@@ -96,12 +94,12 @@ class CaseFilesTable extends Table
             'foreignKey' => 'easycase_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Defects', [
-            'foreignKey' => 'defect_id',
-        ]);
-        $this->hasMany('Archives', [
-            'foreignKey' => 'case_file_id',
-        ]);
+        // Defects and Archives are not part of this edition: neither the table
+        // classes nor the tables exist. Declaring the associations made saving
+        // any attachment fail with "Table class for alias `Defects` could not be
+        // found", so every task attachment was lost (public issue #17). The
+        // columns case_files.defect_id and the rest stay for schema
+        // compatibility; nothing here reads them.
         $this->hasMany('CaseRemovedFiles', [
             'foreignKey' => 'case_file_id',
         ]);
