@@ -191,24 +191,33 @@ class ProjectsController extends AppController
         $roleAccess = $roleInfo['roleAccess'];
         $pid = $this->request->getQuery('pid') ?? $this->request->getData('pid');
         $prj = [];
-        if (!empty($pid)) {
-            $projArr = $prj = $this->Projects->find()
-                ->select($this->Projects)
-                ->where(['uniq_id' => $pid, 'company_id' => SES_COMP])
-                ->disableHydration()
-                ->first();
 
-            if ($projArr) {
-                $usersTable = $this->fetchTable('Users');
-                $getUser = $usersTable->find()
-                    ->select(['name'])
-                    ->where(['isactive' => 1, 'id' => $projArr['user_id']])
-                    ->disableHydration()
-                    ->first();
-                if ($getUser) {
-                    $uname = $getUser['name'];
-                }
-            }
+        // Everything below reads the project's id. Without a project those
+        // queries were handed a null and the request died with a 500
+        // ("Expression `project_id` is missing operator"), which told the
+        // caller nothing at all. An unknown project is a 404.
+        if (empty($pid)) {
+            throw new NotFoundException(__('No project was specified.'));
+        }
+
+        $projArr = $prj = $this->Projects->find()
+            ->select($this->Projects)
+            ->where(['uniq_id' => $pid, 'company_id' => SES_COMP])
+            ->disableHydration()
+            ->first();
+
+        if (!$projArr) {
+            throw new NotFoundException(__('That project could not be found.'));
+        }
+
+        $usersTable = $this->fetchTable('Users');
+        $getUser = $usersTable->find()
+            ->select(['name'])
+            ->where(['isactive' => 1, 'id' => $projArr['user_id']])
+            ->disableHydration()
+            ->first();
+        if ($getUser) {
+            $uname = $getUser['name'];
         }
         $easycaseTable = $this->fetchTable('Easycases');
         $statusGroupsTable = $this->fetchTable('StatusGroups');
