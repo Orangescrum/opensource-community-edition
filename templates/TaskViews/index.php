@@ -141,6 +141,15 @@ $legacyList = null;
         top: 4px;
     }
 
+    /*
+     * Show/Hide sits in the same top-right corner, so moving the close button
+     * inside put one on top of the other (public issue #23 - a regression from
+     * the fix above). Reserve the close button's width plus a gap.
+     */
+    body.page-taskviews .crt_tsk #showhide_task_conf {
+        margin-right: 48px;
+    }
+
     body.page-taskviews .crt_tsk .crt_popup_close .close .material-icons {
         color: #666;
     }
