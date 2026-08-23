@@ -76,6 +76,13 @@
     ?>
     <div class="task-list-bar  project-grid-page">
         <div class="wrap_top_tlbar">
+            <!--
+                The selected-filter chips used to share the toolbar row, in a
+                two-column slot at the far right - directly under the filter
+                drawer, which opens over that corner and hid them. They get
+                their own full-width row beneath the toolbar instead, where
+                there is room for several and nothing covers them.
+            -->
             <div class="row">
                 <div class="col-lg-12">
                     <div
@@ -96,10 +103,7 @@
                         </ul>
                     </div>
 
-                    <div class="<?php if ($projtype !== 'active-grid') { ?> col-lg-2 col-sm-2  <?php } else { ?> col-lg-2 col-sm-2 <?php } ?>">
-                        <div id="proj_filtered_items" class="filter_tag_items"></div>
-                    </div>
-                    <div class="<?php if ($projtype !== 'active-grid') { ?> col-lg-2 col-sm-2  <?php } else { ?> col-lg-2 col-sm-2 <?php } ?>">
+                    <div class="<?php if ($projtype !== 'active-grid') { ?> col-lg-4 col-sm-4  <?php } else { ?> col-lg-4 col-sm-4 <?php } ?>">
                         <div id="tour_proj_view" class="fr pfl-icon-dv gidview-proj-menu">
                             <div class="btn-group-section">
                                 <span id="task_filter" class="dropdown task_section case-filter-menu">
@@ -136,6 +140,9 @@
                         <div class="cb"></div>
                     </div>
                     <div class="cb"></div>
+                </div>
+                <div class="col-lg-12">
+                    <div id="proj_filtered_items" class="filter_tag_items"></div>
                 </div>
             </div>
         </div>

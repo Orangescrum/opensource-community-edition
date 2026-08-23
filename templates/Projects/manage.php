@@ -401,7 +401,10 @@
     let changeProjectStatusUrl = '<?php echo $this->Url->build(["controller" => "Projects","action" => "changeProjectStatus"]);?>';
     let cardViewUrl = '<?php echo $this->Url->build(["controller" => "Projects","action" => "ajaxCardView"]);?>';
     $(document).ready(function() {
-        var vue_obj = new Vue({
+        // Exposed so the filter controls can update the card list in place
+        // rather than reloading the whole page (see applyProjectFilterParams
+        // in script_v1.js). Named explicitly rather than leaking `vue_obj`.
+        var vue_obj = window.projectCardView = new Vue({
             el: '#project-card-view',
             vuetify: new Vuetify({
                 icons: {

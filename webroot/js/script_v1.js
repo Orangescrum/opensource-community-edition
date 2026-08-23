@@ -23947,11 +23947,7 @@ function project_remember_filters(name, value, label) {
                 pm = [];
             }
             localStorage.setItem('keepFilterModalOpen', 'true');
-            if (project_type_grid == 'active-grid') {
-                window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-            } else {
-                window.location = HTTP_ROOT + 'projects/manage?' + param;
-            }
+            applyProjectFilterParams(param, project_type_grid);
         } else if (name == 'PROJECTMANAGETYPE') {
             var dpArr = new Array();
             var dpArrLab = new Array();
@@ -23996,11 +23992,7 @@ function project_remember_filters(name, value, label) {
                 pmArr = [];
             }
             localStorage.setItem('keepFilterModalOpen', 'true');
-            if (project_type_grid == 'active-grid') {
-                window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-            } else {
-                window.location = HTTP_ROOT + 'projects/manage?' + param;
-            }
+            applyProjectFilterParams(param, project_type_grid);
         } else if (name == 'PROJECTMANAGECLIENTS') {
             var dcArr = new Array();
             var dcArrLab = new Array();
@@ -24045,11 +24037,7 @@ function project_remember_filters(name, value, label) {
                 dsArr = [];
             }
             localStorage.setItem('keepFilterModalOpen', 'true');
-            if (project_type_grid == 'active-grid') {
-                window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-            } else {
-                window.location = HTTP_ROOT + 'projects/manage?' + param;
-            }
+            applyProjectFilterParams(param, project_type_grid);
         } else if (name == 'PROJECTMANAGEMANAGER') {
             var dsArr = new Array();
             var dsArrLab = new Array();
@@ -24094,11 +24082,7 @@ function project_remember_filters(name, value, label) {
                 dcArr = [];
             }
             localStorage.setItem('keepFilterModalOpen', 'true');
-            if (project_type_grid == 'active-grid') {
-                window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-            } else {
-                window.location = HTTP_ROOT + 'projects/manage?' + param;
-            }
+            applyProjectFilterParams(param, project_type_grid);
         } else if (name == 'PROJECTCLIENTS') {
             var dcArr = new Array();
             var dcArrLab = new Array();
@@ -24225,11 +24209,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         pmArr = [];
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + param;
-                    }
+                    applyProjectFilterParams(param, project_type_grid);
                 }
                 reloadtble();
                 checkProjFltSelect();
@@ -24264,11 +24244,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         urlParam.push(encodeURI(i) + "=" + encodeURI(filters[i]));
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + urlParam.join("&");
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + urlParam.join("&");
-                    }
+                    applyProjectFilterParams(urlParam.join("&"), project_type_grid);
                 } else {
                     localStorage.removeItem('PROJECTTYPE');
                     localStorage.removeItem('PROJECTTYPEVAL');
@@ -24331,11 +24307,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         pmArr = [];
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + param;
-                    }
+                    applyProjectFilterParams(param, project_type_grid);
                 }
                 reloadtble();
                 checkProjFltSelect();
@@ -24366,11 +24338,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         urlParam.push(encodeURI(i) + "=" + encodeURI(filters[i]));
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + urlParam.join("&");
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + urlParam.join("&");
-                    }
+                    applyProjectFilterParams(urlParam.join("&"), project_type_grid);
 
                 } else {
                     localStorage.removeItem('PROJECTSTATUS');
@@ -24434,11 +24402,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         pmArr = [];
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + param;
-                    }
+                    applyProjectFilterParams(param, project_type_grid);
 
                 }
                 checkProjFltSelect();
@@ -24474,11 +24438,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         urlParam.push(encodeURI(i) + "=" + encodeURI(filters[i]));
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + urlParam.join("&");
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + urlParam.join("&");
-                    }
+                    applyProjectFilterParams(urlParam.join("&"), project_type_grid);
 
                 } else {
                     localStorage.removeItem('PROJECTCLIENTS');
@@ -24546,11 +24506,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         pmArr = [];
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + param;
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + param;
-                    }
+                    applyProjectFilterParams(param, project_type_grid);
                 }
                 reloadtble();
                 checkProjFltSelect();
@@ -24584,11 +24540,7 @@ function project_common_reset_filter(ftype, id, obj, label) {
                         urlParam.push(encodeURI(i) + "=" + encodeURI(filters[i]));
                     }
                     localStorage.setItem('keepFilterModalOpen', 'true');
-                    if (project_type_grid == 'active-grid') {
-                        window.location = HTTP_ROOT + 'projects/manage/active-grid?' + urlParam.join("&");
-                    } else {
-                        window.location = HTTP_ROOT + 'projects/manage?' + urlParam.join("&");
-                    }
+                    applyProjectFilterParams(urlParam.join("&"), project_type_grid);
                 } else {
                     localStorage.removeItem('PROJECTMANAGER');
                     localStorage.removeItem('PROJECTMANAGERVAL');
@@ -24796,6 +24748,58 @@ function projendcheckboxrange() {
         var x = from + ":" + to;
         project_remember_filters('PROJECTENDDATE', x, x);
         reloadtble();
+        checkProjFltSelect();
+    }
+}
+
+/*
+ * Apply the project filters without reloading the page.
+ *
+ * Every filter tick used to do window.location = 'projects/manage?' + param,
+ * which threw away and rebuilt the whole page - navbar, sidebar, filter panel
+ * and all - to change a list of cards. The card view is a Vue app whose
+ * options are watched, so writing the same values into projectCardViewOptions
+ * refetches just the cards, through the same projects/ajaxCardView endpoint and
+ * the same database query the page load uses.
+ *
+ * `param` is the query string the callers already build, so the two paths
+ * cannot drift. The address bar is kept in step, so the filtered view can still
+ * be reloaded, shared or bookmarked.
+ *
+ * The grid and list templates are not Vue, so they keep the full navigation.
+ */
+function applyProjectFilterParams(param, gridView) {
+    var isGrid = (gridView === 'active-grid' || gridView === 'inactive-grid');
+    var app = window.projectCardView;
+
+    if (isGrid || !app || !app.projectCardViewOptions) {
+        var seg = isGrid ? '/' + gridView : '';
+        window.location = HTTP_ROOT + 'projects/manage' + seg + (param ? '?' + param : '');
+        return;
+    }
+
+    var q = new URLSearchParams(param || '');
+    var status = q.get('fil-type') || '';
+    var o = app.projectCardViewOptions;
+
+    // One tick, one refetch: Vue batches these before the watcher runs.
+    o.p_type = q.get('proj-type') || '';
+    o.filtype = status;
+    o.url_status = status;
+    o.client = q.get('client') || '';
+    o.manager = q.get('manager') || '';
+    o.page = 1;
+
+    try {
+        window.history.replaceState({}, '', HTTP_ROOT + 'projects/manage' + (param ? '?' + param : ''));
+    } catch (e) {
+        // A blocked history write must not stop the list refreshing.
+    }
+
+    // The panel stays open, so nothing needs to reopen it on the next load.
+    localStorage.removeItem('keepFilterModalOpen');
+
+    if (typeof checkProjFltSelect === 'function') {
         checkProjFltSelect();
     }
 }
