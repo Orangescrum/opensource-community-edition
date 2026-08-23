@@ -77,11 +77,10 @@
     <div class="task-list-bar  project-grid-page">
         <div class="wrap_top_tlbar">
             <!--
-                The selected-filter chips used to share the toolbar row, in a
-                two-column slot at the far right - directly under the filter
-                drawer, which opens over that corner and hid them. They get
-                their own full-width row beneath the toolbar instead, where
-                there is room for several and nothing covers them.
+                The selected-filter chips are NOT in this bar. It is
+                position:fixed with a fixed height, so an extra row here
+                overflows it onto the content below. They render in the page
+                flow instead - see templates/Projects/manage.php.
             -->
             <div class="row">
                 <div class="col-lg-12">
@@ -140,9 +139,6 @@
                         <div class="cb"></div>
                     </div>
                     <div class="cb"></div>
-                </div>
-                <div class="col-lg-12">
-                    <div id="proj_filtered_items" class="filter_tag_items"></div>
                 </div>
             </div>
         </div>

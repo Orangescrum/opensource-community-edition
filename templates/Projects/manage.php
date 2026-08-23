@@ -52,6 +52,15 @@
                     <div class="cb"></div>
                 </div>
             <?php } ?>
+            <!--
+                Selected-filter chips. They belong here, in the page flow just
+                above the cards, rather than in the toolbar: that bar is
+                position:fixed with a fixed height, so chips placed in it either
+                sat under the filter drawer or spilled over the first row of
+                cards.
+            -->
+            <div id="proj_filtered_items" class="filter_tag_items" style="margin:0 12px 8px;"></div>
+
             <v-row id="scroll-row">
                 <v-col v-for="item in data.prjAllArr" :key="item.id" cols="12" md="4">
                     <v-hover v-slot="{ hover }">
