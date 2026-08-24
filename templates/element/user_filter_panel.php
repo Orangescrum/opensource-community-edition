@@ -34,6 +34,23 @@ $filterProjectIds = isset($filterProjectIds) && is_array($filterProjectIds) ? ar
         z-index: 2;
     }
     #usrFilterModal .modal-footer .btn { margin: 0; }
+    /* The shared `.filter_set .filter_toggle_data .dropdown_status_filter_new li a`
+       rule in custom.css sets white-space:nowrap + overflow:visible, so a long
+       project/role name spills out of the panel and breaks the layout. Keep
+       each option on one line but clip it with an ellipsis; the full name is
+       in the title attribute. */
+    #usrFilterModal .usr_filter_list li a { overflow: hidden !important; }
+    #usrFilterModal .usr_filter_list .checkbox label {
+        display: flex; align-items: center; max-width: 100%;
+    }
+    #usrFilterModal .usr_filter_opt_name {
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        min-width: 0; flex: 1;
+    }
+    #usrFilterModal .active_filter_sec_cont .filter_opn {
+        max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap; vertical-align: middle; box-sizing: border-box;
+    }
 </style>
 <div class="modal right fade filterModal" id="usrFilterModal" tabindex="-1" role="dialog" data-backdrop="false">
     <div class="modal-dialog" role="document">
@@ -95,7 +112,7 @@ $filterProjectIds = isset($filterProjectIds) && is_array($filterProjectIds) ? ar
                                                            class="usr_filter_role_chk"
                                                            value="<?php echo (int)$rId; ?>"
                                                            <?php echo in_array((int)$rId, $filterRoleIds, true) ? 'checked' : ''; ?>>
-                                                    <?php echo h($rName); ?>
+                                                    <span class="usr_filter_opt_name" title="<?php echo h($rName); ?>"><?php echo h($rName); ?></span>
                                                 </label>
                                             </div>
                                         </a>
@@ -136,7 +153,7 @@ $filterProjectIds = isset($filterProjectIds) && is_array($filterProjectIds) ? ar
                                                            class="usr_filter_project_chk"
                                                            value="<?php echo (int)$pId; ?>"
                                                            <?php echo in_array((int)$pId, $filterProjectIds, true) ? 'checked' : ''; ?>>
-                                                    <?php echo h($pName); ?>
+                                                    <span class="usr_filter_opt_name" title="<?php echo h($pName); ?>"><?php echo h($pName); ?></span>
                                                 </label>
                                             </div>
                                         </a>
