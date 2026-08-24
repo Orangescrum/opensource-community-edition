@@ -56,6 +56,43 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
  */
 class LogTimesController extends AppController
 {
+    /**
+     * Entries per page on the Time Log screen.
+     *
+     * Deliberately a class constant and not a `define()` in config/globalVars.php:
+     * that file lives in the container's config volume, so an existing install
+     * would keep an older copy of it and every request would die on an
+     * undefined constant.
+     */
+    public const PAGE_LIMIT = 50;
+
+    /**
+     * Page sizes the screen offers. An allow-list, because the size arrives in
+     * the query string and the list must stay bounded: an unbounded LIMIT is
+     * what made this page take 30s and return ~98MB of HTML.
+     */
+    public const PAGE_LIMITS = [25, 50, 100];
+
+    /**
+     * Sortable columns on the Time Log screen, mapped to what the query can
+     * order by. An allow-list: the sort key arrives in the query string, so a
+     * column name must never be taken from it directly.
+     *
+     * The values that are not `LogTime.*` are output aliases of the correlated
+     * subqueries in the select list, which Postgres accepts in ORDER BY. A
+     * value may be a list, which orders by each column in turn.
+     */
+    private const SORTABLE = [
+        'date' => 'LogTime.start_datetime',
+        'resource' => ['user_name', 'user_last_name'],
+        'task_no' => 'task_no',
+        'task_title' => 'task_name',
+        'hours' => 'LogTime.total_hours',
+        'note' => 'LogTime.description',
+        'start' => 'LogTime.start_time',
+        'end' => 'LogTime.end_time',
+    ];
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -71,6 +108,12 @@ class LogTimesController extends AppController
      * The sidebar used to point at an AngularJS page that was removed from
      * this edition, so Time Log hung on its loading placeholders and never
      * opened (public issue #13).
+     *
+     * The list is paginated. It used to load every entry in the company for all
+     * time in one response, which took 30s and produced ~98MB of HTML at 100k
+     * entries, so the page never appeared (public issue #26). The billable and
+     * non-billable totals still cover the whole filtered set, not just the
+     * visible page, so they keep matching the exports.
      */
     public function index()
     {
@@ -82,28 +125,50 @@ class LogTimesController extends AppController
         // logged somewhere else.
         $data += ['projuniqid' => 'all', 'date' => 'alldates'];
 
+        $page = max(1, (int)($data['page'] ?? 1));
+
+        $requestedLimit = (int)($data['limit'] ?? 0);
+        $limit = in_array($requestedLimit, self::PAGE_LIMITS, true) ? $requestedLimit : self::PAGE_LIMIT;
+
+        $sort = isset(self::SORTABLE[$data['sort'] ?? '']) ? $data['sort'] : 'date';
+        $direction = strtolower($data['direction'] ?? '') === 'asc' ? 'ASC' : 'DESC';
+
         $result = $this->fetchLogtimeData($data, [
             'includeTimezoneInfo' => true,
             'processForExport' => true,
+            'limit' => $limit,
+            'page' => $page,
+            'includeHourTotals' => true,
+            'includeEstimatedTotal' => true,
+            'sort' => self::SORTABLE[$sort],
+            'direction' => $direction,
         ]);
 
-        $billable = 0;
-        $nonBillable = 0;
-        foreach ($result['logtimes'] as $row) {
-            $hours = (int)($row['LogTime']['total_hours'] ?? 0);
-            if (!empty($row['LogTime']['is_billable'])) {
-                $billable += $hours;
-            } else {
-                $nonBillable += $hours;
-            }
+        $pageCount = (int)ceil($result['caseCount'] / $limit);
+
+        // A page number past the end would otherwise render an empty table with
+        // no way back, so re-request the last real page.
+        if ($pageCount > 0 && $page > $pageCount) {
+            $query = $this->getRequest()->getQueryParams();
+            $query['page'] = $pageCount;
+
+            return $this->redirect(['action' => 'index', '?' => $query]);
         }
 
         $this->set([
             'caseDetail' => $result['logtimes'],
             'caseCount' => $result['caseCount'],
             'projFil' => $result['projFil'],
-            'total_billable_hours' => $billable,
-            'total_non_billable_hours' => $nonBillable,
+            'total_billable_hours' => $result['hourTotals']['billable'],
+            'total_non_billable_hours' => $result['hourTotals']['nonBillable'],
+            'total_estimated_hours' => $result['estimatedTotal'],
+            'page' => $page,
+            'pageCount' => $pageCount,
+            'pageLimit' => $limit,
+            'pageLimitOptions' => self::PAGE_LIMITS,
+            'sortKey' => $sort,
+            'sortDirection' => $direction,
+            'sortableColumns' => array_keys(self::SORTABLE),
             'pageTitle' => __('Time Log'),
         ]);
         $this->set($result['timezoneInfo']);
@@ -114,6 +179,12 @@ class LogTimesController extends AppController
     /**
      * Common function to fetch logtime data with filtering and processing
      * Used by both CSV and PDF export functions
+     *
+     * `limit` bounds the rows returned; `page` selects which block of them.
+     * Both are off by default because the CSV and PDF exports have to read the
+     * whole set. `includeHourTotals` returns the billable split for the whole
+     * filtered set, which is what lets the screen paginate and still show
+     * totals that match those exports.
      */
     private function fetchLogtimeData($requestData, $options = [])
     {
@@ -121,7 +192,13 @@ class LogTimesController extends AppController
         $defaultOptions = [
             'includeTimezoneInfo' => false,
             'processForExport' => true,
-            'timeFormat' => null
+            'timeFormat' => null,
+            'limit' => null,
+            'page' => 1,
+            'includeHourTotals' => false,
+            'includeEstimatedTotal' => false,
+            'sort' => 'LogTime.start_datetime',
+            'direction' => 'DESC',
         ];
         $options = array_merge($defaultOptions, $options);
 
@@ -315,17 +392,33 @@ class LogTimesController extends AppController
             $conditions['LogTime.user_id'] = $SES_ID;
         }
 
-        // Execute the query
-        $order = ['start_datetime' => 'DESC'];
-        $logtimes = $logTimesTable->selectQuery()
+        // Execute the query. log_id breaks ties on start_datetime: without it
+        // entries logged at the same moment can swap places between two page
+        // requests, so a row is shown twice or skipped.
+        // Resource Name orders by first and last name, so the sort key can be a
+        // list of columns rather than one.
+        $order = [];
+        foreach ((array)$options['sort'] as $sortColumn) {
+            $order[$sortColumn] = $options['direction'];
+        }
+        $order['LogTime.log_id'] = 'DESC';
+        $logtimesQuery = $logTimesTable->selectQuery()
             ->from(['LogTime' => 'log_times'], true)
             ->select($selectFields)
             ->join($joins)
             ->where($conditions)
             ->order($order)
             ->disableResultsCasting()
-            ->disableHydration()
-            ->toArray();
+            ->disableHydration();
+
+        if ($options['limit'] !== null) {
+            $limit = max(1, (int)$options['limit']);
+            $logtimesQuery
+                ->limit($limit)
+                ->offset((max(1, (int)$options['page']) - 1) * $limit);
+        }
+
+        $logtimes = $logtimesQuery->toArray();
 
         $caseCount = $logTimesTable->selectQuery()
             ->from(['LogTime' => 'log_times'], true)
@@ -333,9 +426,84 @@ class LogTimesController extends AppController
             ->where($conditions)
             ->count();
 
+        // Totals aggregated in the database over the whole filtered set, so a
+        // paginated caller still reports hours for everything it filtered to
+        // rather than for the rows on the current page.
+        $hourTotals = ['billable' => 0, 'nonBillable' => 0];
+        if ($options['includeHourTotals']) {
+            // IdentifierExpression, not a plain string: the connection quotes
+            // identifiers, so a raw "LogTime.total_hours" in SQL is folded to
+            // lowercase by Postgres and no longer matches the "LogTime" alias.
+            $sumHours = function (array $billableCondition) use ($logTimesTable, $joins, $conditions) {
+                $query = $logTimesTable->selectQuery()
+                    ->from(['LogTime' => 'log_times'], true)
+                    ->join($joins)
+                    ->where($conditions)
+                    ->where($billableCondition)
+                    ->disableHydration();
+
+                $query->select([
+                    'total' => $query->func()->sum(new IdentifierExpression('LogTime.total_hours')),
+                ], true);
+
+                return (int)($query->first()['total'] ?? 0);
+            };
+
+            $hourTotals = [
+                'billable' => $sumHours(['LogTime.is_billable !=' => 0]),
+                'nonBillable' => $sumHours(['LogTime.is_billable' => 0]),
+            ];
+        }
+
+        // Estimated hours of the tasks this filtered set touches, counted once
+        // per task however many entries were logged against it.
+        $estimatedTotal = 0;
+        if ($options['includeEstimatedTotal']) {
+            $taskIds = $logTimesTable->selectQuery()
+                ->from(['LogTime' => 'log_times'], true)
+                ->select(['LogTime.task_id'], true)
+                ->join($joins)
+                ->where($conditions)
+                ->distinct();
+
+            $estimatedQuery = $easycasesTable->find();
+            $estimatedQuery->select([
+                'total' => $estimatedQuery->func()->sum(
+                    new IdentifierExpression($easycasesTable->getAlias() . '.estimated_hours')
+                ),
+            ], true)
+                ->where(['id IN' => $taskIds])
+                ->disableHydration();
+
+            $estimatedTotal = (int)($estimatedQuery->first()['total'] ?? 0);
+        }
+
         // Process the results if requested
         if ($options['processForExport'] && !empty($logtimes)) {
             $useTimeFormat = $options['timeFormat'] ?: $SES_TIME_FORMAT;
+
+            // Project names for every row in one query. This was a
+            // getProjectName() call per row, i.e. one SELECT per entry, which
+            // is most of why a 100k-entry CSV export took 36s.
+            $projectNames = [];
+            if ($projFil == 'all') {
+                $projectIds = array_values(array_unique(array_filter(
+                    array_map(fn($row) => (int)($row['LogTime']['project_id'] ?? 0), $logtimes)
+                )));
+                if (!empty($projectIds)) {
+                    $projectNames = $projectsTable->find()
+                        ->select(['id', 'name'])
+                        ->where([
+                            'id IN' => $projectIds,
+                            'isactive' => 1,
+                            'company_id' => $SES_COMP,
+                        ])
+                        ->disableHydration()
+                        ->all()
+                        ->combine('id', 'name')
+                        ->toArray();
+                }
+            }
 
             foreach ($logtimes as $key => $val) {
                 // Convert datetime fields to user timezone
@@ -362,7 +530,7 @@ class LogTimesController extends AppController
 
                 // Add project name for 'all' projects filter
                 if ($projFil == 'all') {
-                    $logtimes[$key]['LogTime']['prj_name'] = $this->Format->getProjectName($logtimes[$key]['LogTime']['project_id']);
+                    $logtimes[$key]['LogTime']['prj_name'] = $projectNames[(int)$logtimes[$key]['LogTime']['project_id']] ?? '';
                 }
             }
         }
@@ -372,7 +540,9 @@ class LogTimesController extends AppController
             'caseCount' => $caseCount,
             'projFil' => $projFil,
             'project_id' => $project_id ?? null,
-            'timezoneInfo' => $timezoneInfo
+            'timezoneInfo' => $timezoneInfo,
+            'hourTotals' => $hourTotals,
+            'estimatedTotal' => $estimatedTotal,
         ];
     }
 
@@ -440,6 +610,12 @@ class LogTimesController extends AppController
             foreach ($logtimes as $val) {
                 $row = [];
                 foreach ($checkedFields as $field) {
+                    // Same guard as the header row above. Without it a column
+                    // name the header skipped still reached the match below and
+                    // threw UnhandledMatchError, so the whole export 500'd.
+                    if (!isset($headerMap[$field])) {
+                        continue;
+                    }
                     $row[] = match ($field) {
                         'date' => date($CSV_DT_FORMAT, strtotime($val['LogTime']['start_datetime'])),
                         'usr_name' => $val['user_name'] . ' ' . $val['user_last_name'],
