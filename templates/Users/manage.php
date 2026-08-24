@@ -572,12 +572,19 @@ endif; ?>
             return;
         }
 
-        var html = '';
+        /* Build the chips as elements. A name is user-supplied, and
+           .text().html() escapes < > & but NOT the double quote, so pasting
+           it into a title="..." string lets a name close the attribute and
+           add its own. jQuery sets both title and text through the safe
+           paths. */
+        $cont.empty();
         for (var i = 0; i < active.length; i++) {
-            var safe = $('<div/>').text(active[i]).html();
-            html += '<span class="filter_opn" title="' + safe + '">' + safe + '</span>';
+            $cont.append($('<span/>', {
+                'class': 'filter_opn',
+                title: active[i],
+                text: active[i]
+            }));
         }
-        $cont.html(html);
         $sec.show();
         $reset.show();
     }
