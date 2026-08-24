@@ -56,9 +56,7 @@
                     <input type="hidden" value="<?php echo $proj_id ?? ($porj_id ?? ''); ?>" name="proj_id" id="proj_id"/>
                     <input type="hidden" value="<?php echo $proj_uid ?? ($porj_uid ?? ''); ?>" name="proj_uid" id="proj_uid"/>
                     <div class="form-group">
-                        <input type="file" name="import_csv" id="import_csv" onchange="check_csvfile();
-                                    check_multiple_project();
-                                    $('#cnt_btn').prop('disabled', false);"/>
+                        <input type="file" name="import_csv" id="import_csv" onchange="fileChosen();"/>
                         <div class="input-group">
                             <input readonly="" class="form-control" placeholder="<?php echo __('Upload your CSV file');?>" type="text" id="task_impot_placeholder">
                             <span class="input-group-btn input-group-sm">
@@ -292,6 +290,38 @@
 </div>
 <script type="text/javascript">
     var csvurl = '<?php echo $this->Url->build(['controller' => 'Projects', 'action' => 'downloadSampleCsvFile']); ?>';
+
+    /*
+     * Continue must follow the outcome of the file checks, not the change event.
+     * It used to be enabled by the third statement of the input's onchange,
+     * which ran before either check had answered; the checks then rejected the
+     * file and emptied the input without switching the button back off, so
+     * Continue posted an empty form and the server bounced it straight back.
+     *
+     * The two checks run concurrently, so enabling is refused whenever the
+     * input no longer holds a file: whichever check answers last cannot
+     * re-enable a file that the other one has already rejected.
+     */
+    function setContinueEnabled(on) {
+        if (on && !$('#import_csv').val()) {
+            on = false;
+        }
+        $('#cnt_btn').prop('disabled', !on).toggleClass('cmn_disabled_btn', !on);
+    }
+
+    function clearChosenFile() {
+        $('#import_csv').val('');
+        $('#task_impot_placeholder').val('');
+        setContinueEnabled(false);
+    }
+
+    function fileChosen() {
+        $('#err_span').html('');
+        setContinueEnabled(false);
+        check_csvfile();
+        check_multiple_project();
+    }
+
     function check_csvfile() {
         var url = '<?php echo HTTP_ROOT; ?>' + 'project-imports/checkfile_existance';
         if ($('#import_csv').val()) {
@@ -319,31 +349,28 @@
                         if (data.error) {
                             if (confirm(data.msg)) {
                                 call_validation();
-                                $('#cnt_btn').prop('disabled', false);
-                                $('#cnt_btn').removeClass('cmn_disabled_btn');
-                            }else{
-                                $('#import_csv').val('');
-                                $('#task_impot_placeholder').val('');
+                                setContinueEnabled(true);
+                            } else {
+                                clearChosenFile();
                             }
                         } else {
-                            $('#cnt_btn').prop('disabled', false);
-                            $('#cnt_btn').removeClass('cmn_disabled_btn');
+                            setContinueEnabled(true);
                         }
                     },
                     error: function () {
                         // Without this the spinner never clears and Continue stays
                         // disabled, which reads as a frozen page.
                         $('#loader_img_csv').hide();
+                        clearChosenFile();
                         $('#err_span').html('<?php echo __('Could not check the file. Please try again.');?><br/>');
                     }
                 });
             } else {
                 $('#err_span').html('<?php echo __('Please upload a valid csv file');?><br/>');
-                $('#import_csv').val('');
+                clearChosenFile();
             }
         } else {
-            $('#cnt_btn').prop('disabled', true);
-            $('#cnt_btn').addClass('cmn_disabled_btn');
+            setContinueEnabled(false);
         }
     }
     function ajax_exportCsv(is_milestone) {
@@ -472,12 +499,10 @@
                 processData: false,
                 type: 'POST',
                 success: function (data) {
-                    delete_file(filename);
                     if (data.trim() == 2) {
-                        alert('<?php echo __('There is no project name column in the CSV');?>');
-                        window.location = HTTP_ROOT + 'projects/importexport/' + pro_id;
-                        $("#import_csv").val('');
-                        $("#import_csv").html('');
+                        delete_file(filename);
+                        clearChosenFile();
+                        $('#err_span').html('<?php echo __('There is no project name column in the CSV');?><br/>');
                     }
                     $('#loader_img_csv').hide();
                 },
@@ -505,31 +530,31 @@
                     delete_file(filename);
                     var msg = '<?php echo __('You have chosen');?> "' + pname + '" <?php echo __('project to import task, but you are trying to import task(s) for project(s) other than selected project. Please choose (all) option from the project drop down menu to import multiple project(s) task(s) at a time');?>.';
                     showTopErrSucc('error', msg, 1);
-                    setTimeout(function () {
-                        window.location = HTTP_ROOT + 'projects/importexport';
-                    }, 15000);
-                    $("#import_csv").val('');
-                    $("#import_csv").html('');
+                    clearChosenFile();
                 } else if (data.trim() == 'exists' || data.trim() == 'no_project' || data.trim() == 'more_pro') {
-
+                    // The file is for this project. This branch was empty, so a
+                    // valid file left the button in whatever state the change
+                    // event had put it in.
+                    setContinueEnabled(true);
                 } else if (data.trim() == 0 || data.trim() == 3) {
                     delete_file(filename);
                     var msg = "<?php echo __('Invalid CSV file'); ?>, <a href='" + HTTP_ROOT + "projects/downloadSampleCsvFile' style='text-decoration:underline;color:#0000FF'><?php echo __('Download'); ?></a> <?php echo __('and check with our sample file');?>.";
                     showTopErrSucc('error', msg, 1);
-                    setTimeout(function () {
-                        window.location = HTTP_ROOT + 'projects/importexport';
-                    }, 6000);
+                    clearChosenFile();
                 }
             },
             error: function () {
                 $('#loader_img_csv').hide();
+                clearChosenFile();
                 $('#err_span').html('<?php echo __('Could not check the file. Please try again.');?><br/>');
             }
         });
     }
+    // proj_id is part of the stored name, so without it the server looks for
+    // "<user>__<file>" and deletes nothing.
     function delete_file(file_name) {
         var url = '<?php echo $this->Url->build(['controller' => 'ProjectImports', 'action' => 'deleteFile'], ['fullBase' => true]); ?>';
-        $.post(url, {"file_name": file_name}, function (res) {
+        $.post(url, {"file_name": file_name, "proj_id": $('#proj_id').val()}, function (res) {
         });
     }
     $(function () {

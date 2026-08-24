@@ -307,9 +307,22 @@ class ProjectImportsController extends AppController
          * would delete the sample - and one user could delete another's file.
          */
         if ($dir === self::TIMELOG_DIR) {
-            $candidates = [SES_ID . '_timelog_' . $name];
+            $prefix = SES_ID . '_timelog_';
         } else {
-            $candidates = [SES_ID . '_' . (string)$this->request->getData('proj_id') . '_' . $name];
+            $prefix = SES_ID . '_' . (string)$this->request->getData('proj_id') . '_';
+        }
+
+        $candidates = [$prefix . $name];
+
+        /*
+         * The preview step sends back the name the file was stored under, not
+         * the one the user picked, so prefixing it again produced
+         * "1_1_1_1_foo.csv" and Cancel silently deleted nothing. An
+         * already-prefixed name is accepted as it stands, but only when the
+         * prefix is this user's own.
+         */
+        if (strpos($name, (string)SES_ID . '_') === 0) {
+            $candidates[] = $name;
         }
 
         $removed = false;
