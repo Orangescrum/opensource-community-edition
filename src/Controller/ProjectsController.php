@@ -2679,7 +2679,7 @@ class ProjectsController extends AppController
     public function importexport($project_uniq_id = '')
     {
         if (SES_TYPE > CompanyUsersTable::ADMIN) {
-            return $this->redirect(['Controller' => 'Easycases', 'action' => 'dashboard']);
+            return $this->redirect(['controller' => 'Easycases', 'action' => 'dashboard']);
         }
 
         $proj_id = $proj_uid = $import_pjname = '';
@@ -2689,7 +2689,7 @@ class ProjectsController extends AppController
         } else {
             $project_uniq_id = $project_uniq_id ?: ($GLOBALS['getallproj'][0]['Project']['uniq_id'] ?? '');
             if (!$project_uniq_id) {
-                return $this->redirect(['Controller' => 'Projects', 'action' => 'manage']);
+                return $this->redirect(['controller' => 'Projects', 'action' => 'manage']);
             }
             $proj_details = $this->Projects->find()
                 ->select(['id', 'name'])
@@ -2697,7 +2697,7 @@ class ProjectsController extends AppController
                 ->disableHydration()
                 ->first();
             if (empty($proj_details)) {
-                return $this->redirect(['Controller' => 'Projects', 'action' => 'manage']);
+                return $this->redirect(['controller' => 'Projects', 'action' => 'manage']);
             }
             $proj_id = $proj_details['id'];
             $proj_uid = $project_uniq_id;
@@ -2865,7 +2865,7 @@ class ProjectsController extends AppController
             $header_arr = $task = [];
             if (($handle = fopen(CSV_PATH . 'task_milstone' . DS . $file_name, 'r')) !== false) {
                 $separator = ',';
-                $chk_coma = $data = fgetcsv($handle, 500, ',');
+                $chk_coma = $data = fgetcsv($handle, 0, ',');
                 if (count($chk_coma) == 1 && stristr($chk_coma[0], ';')) {
                     $separator = ';';
                 }
@@ -2881,7 +2881,7 @@ class ProjectsController extends AppController
                 );
 
                 $i = 0;
-                while (($data = fgetcsv($handle, 500, $separator)) !== false) {
+                while (($data = fgetcsv($handle, 0, $separator)) !== false) {
                     if ($project_id == 'all' && (strtolower($data[0] ?? '') == 'project' || strtolower($data[0] ?? '') == 'project name') && empty($data[0])) {
                         continue;
                     }
@@ -3129,7 +3129,7 @@ class ProjectsController extends AppController
 
         if (($handle = fopen($importFile, 'r')) !== false) {
             $i = 0;
-            while (($data = fgetcsv($handle, 500, ',')) !== false) {
+            while (($data = fgetcsv($handle, 0, ',')) !== false) {
                 if (!$i) {
                     // Check for column count
                     if (count($data) >= 1) {
@@ -3226,7 +3226,7 @@ class ProjectsController extends AppController
         if ($new_file_name !== '') {
             if (($handle = fopen(CSV_PATH . 'timelog_import' . DS . $new_file_name, 'r')) !== false) {
                 $i = 0;
-                while (($data = fgetcsv($handle, 500, ',')) !== false) {
+                while (($data = fgetcsv($handle, 0, ',')) !== false) {
                     if (!$i) {
                         if (count($data) >= 1) {
                             $fileds = $data;
@@ -3531,7 +3531,7 @@ class ProjectsController extends AppController
                 $i = 0;
                 $j = 0;
                 $separator = ',';
-                $chk_coma = $data = fgetcsv($handle, 500, ',');
+                $chk_coma = $data = fgetcsv($handle, 0, ',');
                 if (count($chk_coma) == 1 && stristr($chk_coma[0], ';')) {
                     $separator = ';';
                 }
@@ -3539,7 +3539,7 @@ class ProjectsController extends AppController
                 $project_list = [];
                 $j = 0;
 
-                while (($data = fgetcsv($handle, 500, $separator)) !== false) {
+                while (($data = fgetcsv($handle, 0, $separator)) !== false) {
                     if (!$i) {
                         // Check for column count
                         if (count($data) >= 1) {
