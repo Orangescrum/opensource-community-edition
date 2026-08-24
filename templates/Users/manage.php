@@ -574,7 +574,8 @@ endif; ?>
 
         var html = '';
         for (var i = 0; i < active.length; i++) {
-            html += '<span class="filter_opn">' + $('<div/>').text(active[i]).html() + '</span>';
+            var safe = $('<div/>').text(active[i]).html();
+            html += '<span class="filter_opn" title="' + safe + '">' + safe + '</span>';
         }
         $cont.html(html);
         $sec.show();
