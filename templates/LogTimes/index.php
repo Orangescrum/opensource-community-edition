@@ -495,6 +495,34 @@ $pagerNav = function () use ($page, $pageCount, $pageUrl) {
 </script>
 
 <style>
+    /*
+     * TOP SPACING. .layout-fixer reserves 125px, sized for the task list's
+     * offset filter bar, which this page does not render. The only fixed bar
+     * above the content here is .custom-navbar.nav_inr_menu at 50px, so 75px
+     * of that reserve showed as empty grey between the navbar and the card.
+     *
+     * Trimmed on .layout-fixer itself rather than re-added as padding on
+     * .rht_content_cmn: the Create Task popup is position:relative in that
+     * container's normal flow, so padding there pulls it up under the navbar
+     * (templates/TaskViews/index.php documents the same trap). The 20px
+     * padding-top on .wrapper is left alone and becomes the gap.
+     */
+    body.page-logtimes .layout-fixer {
+        height: 50px !important; /* == .custom-navbar.nav_inr_menu height */
+    }
+
+    /*
+     * .wrapper is the scroll container and its height is calc(100vh - 161px),
+     * where 161 is the 125px reserve plus the 36px sticky footer. Trimming the
+     * reserve without this leaves the wrapper ending 75px above the footer, so
+     * the list stops short and the page background shows through as a grey band
+     * (templates/MyDashboards/index.php hit the same thing).
+     */
+    body.page-logtimes .rht_content_cmn.task_lis_page .wrapper {
+        height: calc(100vh - 86px) !important; /* 50px navbar + 36px sticky footer */
+        max-height: none !important;
+    }
+
     .tlog_list_page {
         background: #fff;
         padding: 20px;
