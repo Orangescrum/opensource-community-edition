@@ -2,20 +2,16 @@
 # tree be executed by the server — it must only ever be served as inert bytes.
 # This is the definitive backstop behind the upload extension allowlist: even if
 # a dangerous extension slipped through, PHP (and any other handler) will not run.
+#
+# Do NOT add php_admin_flag/php_admin_value here. Apache only accepts those in
+# server or virtual-host config; in .htaccess they raise
+#   "php_admin_flag not allowed here"
+# which makes Apache return 500 for EVERY request under /files/ — no avatar,
+# project logo or attachment can be served. The directives below achieve the
+# same result and are valid in this context.
 
-# Disable the PHP engine for this directory and below (mod_php).
-<IfModule mod_php.c>
-    php_admin_flag engine off
-</IfModule>
-<IfModule mod_php7.c>
-    php_admin_flag engine off
-</IfModule>
-<IfModule mod_php8.c>
-    php_admin_flag engine off
-</IfModule>
-
-# Belt-and-suspenders: refuse to serve anything that maps to a code handler,
-# regardless of how PHP/CGI is wired up on the host.
+# Refuse to serve anything that maps to a code handler, regardless of how
+# PHP/CGI is wired up on the host.
 <FilesMatch "(?i)\.(php[0-9]?|phtml|phtm|pht|phar|phps|inc|cgi|pl|py|rb|sh|asp|aspx|jsp|jspx|cfm|shtml|svg|svgz|htaccess|htm|html|xhtml)$">
     Require all denied
 </FilesMatch>
