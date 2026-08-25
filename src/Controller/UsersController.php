@@ -2955,7 +2955,10 @@ class UsersController extends AppController
             }
             $userInfo = $this->Users->get($userId);
 
-            /*try {*/
+            /* Re-enabled. While this was commented out, the throws below - an
+               empty address, or one another account already owns - escaped as
+               a 500 error page instead of the message they carry. */
+            try {
             $email = trim($this->request->getData('data.User.email', ''));
 
             if (empty($email)) {
@@ -2970,14 +2973,20 @@ class UsersController extends AppController
                     throw new Exception(__('Oops! Email address already exists.'), 1);
                 }
 
-                $userInfo->update_email = $email;
-                // if updated by admin or owner ie from user manage page
+                /*
+                 * The address used to be parked in update_email behind a
+                 * confirmation link. That link was never sent - the sending
+                 * method does not exist in this edition - and nothing ever
+                 * read update_random back, so the change could not complete
+                 * and the screen still reported success (public issue #34).
+                 * Apply it directly; the caller is already authenticated and
+                 * the address is checked for duplicates above.
+                 */
+                $userInfo->email = $email;
+                $userInfo->update_email = '';
+                $userInfo->update_random = '';
                 $userInfo->updated_by = $isAjax ? 1 : 0;
-                $userInfo->update_random = $random_number = $this->Format->generateUniqNumber();
-                //set the updated email for event log table
                 $update_email = $email;
-                // $this->send_update_email_noti($userInfo->toArray(), $update_email);
-                $email = $userInfo->email;
                 $email_update = true;
             }
 
@@ -3097,14 +3106,13 @@ class UsersController extends AppController
                 if (isset($is_timezone_changed) && $is_timezone_changed) {
                     Cache::delete("SES_TIMEZONE_{$userInfo->id}");
                 }
-                $msg['error'] = ($email_update) ? "Profile updated successfully.<br />A confirmation link has been sent to '{$update_email}'." : 'Profile updated successfully';
+                $msg['error'] = ($email_update) ? __("Profile updated successfully. Sign in with {0} from now on.", $update_email) : __('Profile updated successfully');
                 $msg['close'] = 1;
             }
-            /*} catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 $msg['error'] = $ex->getMessage();
                 $msg['close'] = 0;
-                // debug($ex);
-            }*/
+            }
             if (empty($msg)) {
                 $msg['error'] = '';
                 $msg['close'] = 1;
