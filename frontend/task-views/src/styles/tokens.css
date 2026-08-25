@@ -86,6 +86,12 @@
     font-family: inherit;
 }
 
+:where(#taskViewsApp, .v-overlay-container) label {
+    margin: 0;
+    max-width: none;
+    font-weight: 400;
+}
+
 /* Vuetify teleports menu and dialog content into `.v-overlay-container`, which
    lives outside #taskViewsApp — so it inherits nothing from the block above and
    would fall back to Vuetify's Roboto. Every dropdown in the page renders here,
