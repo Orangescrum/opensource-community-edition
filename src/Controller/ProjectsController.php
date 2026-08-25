@@ -3829,20 +3829,15 @@ class ProjectsController extends AppController
             }
             if ($map[$con_val]) {
                 $pval = !empty($projectId) ? $projectId : $project_id;
-                if (
-                    (isset($v['taskgroup']) && trim($v['taskgroup']) || isset($v['task group']) && trim($v['task group'])) &&
-                    strtolower(trim($v['taskgroup'])) != 'default'
-                ) {
+                // Either spelling of the column may be present, and neither is
+                // guaranteed, so settle on one value before reading it.
+                $taskgroup = trim($v['taskgroup'] ?? $v['task group'] ?? '');
+                if ($taskgroup !== '' && strtolower($taskgroup) != 'default') {
                     $default = 0;
-                    $milestone_id = !empty($array_milston_ids[$pval][trim($v['taskgroup'])]) ? $array_milston_ids[$pval][trim($v['taskgroup'])] : '';
-                    if (empty($milestone_id)) {
-                        if (isset($v['task group'])) {
-                            $milestone_id = $array_milston_ids[$pval][trim($v['task group'])];
-                        }
-                    }
-                } elseif ($k == 0 && (trim($v['taskgroup'] ?? '') == '' || (isset($v['task group']) && trim($v['task group']) == ''))) {
+                    $milestone_id = $array_milston_ids[$pval][$taskgroup] ?? '';
+                } elseif ($k == 0 && $taskgroup === '') {
                     $default = 1;
-                } elseif (strtolower(trim($v['taskgroup'] ?? '')) == 'default' || (isset($v['task group']) && strtolower(trim($v['task group'])) == 'default')) {
+                } elseif (strtolower($taskgroup) == 'default') {
                     $default = 1;
                 }
 
@@ -3853,7 +3848,7 @@ class ProjectsController extends AppController
                     $task_data_arr = array_flip($task_data_arr);
                     $task_data_arr = array_change_key_case($task_data_arr, CASE_LOWER);
                 }
-                if (!trim($v['title']) && !trim($v['task title'])) {
+                if (!trim($v['title'] ?? '') && !trim($v['task title'] ?? '')) {
                     continue;
                 }
                 $title = !empty($v['title']) ? $this->Format->contains_any_multibyte($v['title']) ? mb_convert_encoding($v['title'], 'UTF-8', 'ISO-8859-1') : mb_convert_encoding($v['title'], 'UTF-8', 'ISO-8859-1') : '';
@@ -3939,20 +3934,8 @@ class ProjectsController extends AppController
                 }
 
                 $easycase['project_id'] = $pval;
-                if (!isset($v['created by'])) {
-                    $easycase['user_id'] = (isset($user_list[trim($v['created by'] ?? '')]) && !empty($user_list[trim($v['created by'] ?? '')])) ? $user_list[trim($v['created by'])] : SES_ID;
-                } else {
-                    if (strtolower($v['created by']) != 'me' && $v['created by']) {
-                        if (!empty($asigne_users_list) && array_search($v['created by'], $asigne_users_list)) {
-                            $easycase['user_id'] = array_search($v['user_id'], $asigne_users_list);
-                        } else {
-                            $easycase['user_id'] = SES_ID;
-                        }
-                    } else {
-                        $easycase['user_id'] = SES_ID;
-                    }
-                }
-                $easycase['user_id'] = (isset($user_list[trim($v['created by'])]) && !empty($user_list[trim($v['created by'])])) ? $user_list[trim($v['created by'])] : SES_ID;
+                $created_by = trim($v['created by'] ?? '');
+                $easycase['user_id'] = !empty($user_list[$created_by]) ? $user_list[$created_by] : SES_ID;
 
                 $priority = match (strtolower($v['priority'] ?? '')) {
                     'high' => 0,
