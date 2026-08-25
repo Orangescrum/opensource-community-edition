@@ -252,9 +252,18 @@
 
 /* ---- Focus: one visible treatment everywhere ---- */
 #taskViewsApp :focus-visible {
-    outline: 2px solid var(--tv-brand);
+    outline: none;
     outline-offset: -1px;
     border-radius: 2px;
+}
+
+/*
+ * The search field is the one control whose focus treatment is painted by its
+ * wrapper (.tv-search:focus-within), so the ring above landed a second border
+ * inside the pill (public issue #31).
+ */
+#taskViewsApp .tv-search input:focus-visible {
+    outline: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
