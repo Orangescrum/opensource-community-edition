@@ -2,25 +2,15 @@
 import { computed, ref } from "vue";
 import { GROUP_BY_OPTIONS, useTaskStore } from "@/store/useTaskStore";
 import { COLUMNS, PRIORITIES, STATUSES } from "@/data/tasks";
-import { CREATED_OPTIONS, PRESETS } from "@/data/serverFilters";
-import FacetFilter from "@/components/FacetFilter.vue";
+import { PRESETS } from "@/data/serverFilters";
+import FilterMenu from "@/components/FilterMenu.vue";
+import ActiveFilters from "@/components/ActiveFilters.vue";
 import ConfirmTyped from "@/components/ConfirmTyped.vue";
 
 const store = useTaskStore();
 const toggleable = COLUMNS.filter((c) => !c.always);
 const confirmArchive = ref(false);
 const confirmDelete = ref(false);
-
-/** Mirrors the store's dueBucket keys. */
-const DUE_FILTERS = [
-    { value: "overdue", label: "Overdue" },
-    { value: "today", label: "Today" },
-    { value: "tomorrow", label: "Tomorrow" },
-    { value: "week", label: "This week" },
-    { value: "month", label: "This month" },
-    { value: "later", label: "Later" },
-    { value: "none", label: "No due date" },
-];
 
 const groupByLabel = computed(() => {
     const active = GROUP_BY_OPTIONS.find((g) => g.value === store.groupBy);
@@ -30,11 +20,6 @@ const groupByLabel = computed(() => {
 const presetLabel = computed(
     () => PRESETS.find((p) => p.value === store.preset)?.label ?? "All tasks",
 );
-
-const createdLabel = computed(() => {
-    const active = CREATED_OPTIONS.find((c) => c.value === store.createdRange);
-    return active ? `Created: ${active.label}` : "Created";
-});
 </script>
 
 <template>
@@ -52,7 +37,7 @@ const createdLabel = computed(() => {
         <v-menu location="bottom start" offset="4">
             <template #activator="{ props: menu }">
                 <button v-bind="menu" type="button" class="tv-ghost" :class="{ 'is-on': store.preset }">
-                    <v-icon icon="mdi-filter-variant" size="15" aria-hidden="true" />
+                    <v-icon icon="mdi-playlist-check" size="15" aria-hidden="true" />
                     <span>{{ presetLabel }}</span>
                 </button>
             </template>
@@ -72,81 +57,6 @@ const createdLabel = computed(() => {
                 </button>
             </div>
         </v-menu>
-
-        <FacetFilter facet="status" label="Status" :options="STATUSES" />
-        <FacetFilter facet="priority" label="Priority" :options="PRIORITIES" />
-        <FacetFilter facet="type" label="Type" :options="store.typeOptions" />
-        <FacetFilter facet="assignee" label="Assign to" :options="store.assigneeOptions" />
-        <FacetFilter facet="taskGroup" label="Task group" :options="store.taskGroupOptions" />
-        <FacetFilter facet="due" label="Due date" :options="DUE_FILTERS" />
-        <FacetFilter facet="createdBy" label="Created by" :options="store.assigneeOptions" />
-        <FacetFilter facet="commentedBy" label="Commented by" :options="store.assigneeOptions" />
-        <FacetFilter
-            v-if="store.labelOptions.length"
-            facet="label"
-            label="Label"
-            :options="store.labelOptions"
-        />
-
-        <v-menu location="bottom start" offset="4">
-            <template #activator="{ props: menu }">
-                <button
-                    v-bind="menu"
-                    type="button"
-                    class="tv-ghost"
-                    :class="{ 'is-on': store.createdRange }"
-                >
-                    <v-icon icon="mdi-calendar-plus" size="15" aria-hidden="true" />
-                    <span>{{ createdLabel }}</span>
-                </button>
-            </template>
-            <div class="tv-pop">
-                <button
-                    type="button"
-                    class="tv-pop__row"
-                    :aria-pressed="!store.createdRange"
-                    @click="store.setFilter('createdRange', '')"
-                >
-                    <span class="tv-pop__box" :class="{ 'is-on': !store.createdRange }">
-                        <v-icon v-if="!store.createdRange" icon="mdi-check" size="11" />
-                    </span>
-                    <span class="tv-pop__label">Any time</span>
-                </button>
-                <button
-                    v-for="c in CREATED_OPTIONS"
-                    :key="c.value"
-                    type="button"
-                    class="tv-pop__row"
-                    :aria-pressed="store.createdRange === c.value"
-                    @click="store.setFilter('createdRange', c.value)"
-                >
-                    <span class="tv-pop__box" :class="{ 'is-on': store.createdRange === c.value }">
-                        <v-icon v-if="store.createdRange === c.value" icon="mdi-check" size="11" />
-                    </span>
-                    <span class="tv-pop__label">{{ c.label }}</span>
-                </button>
-            </div>
-        </v-menu>
-
-        <button
-            type="button"
-            class="tv-ghost"
-            :class="{ 'is-on': store.favourite }"
-            :aria-pressed="store.favourite"
-            @click="store.toggleFavourite()"
-        >
-            <v-icon :icon="store.favourite ? 'mdi-star' : 'mdi-star-outline'" size="15" />
-            <span>Favourites</span>
-        </button>
-
-        <label class="tv-arch" :class="{ 'tv-arch--on': store.showArchived }">
-            <input
-                type="checkbox"
-                :checked="store.showArchived"
-                @change="store.setShowArchived($event.target.checked)"
-            />
-            Archived
-        </label>
 
         <button
             v-if="store.activeFilterCount"
@@ -179,23 +89,14 @@ const createdLabel = computed(() => {
             </div>
         </v-menu>
 
-        <button
-            type="button"
-            class="tv-ghost tv-ghost--icon"
-            :disabled="store.loading"
-            title="Refresh"
-            aria-label="Refresh"
-            @click="store.refresh()"
-        >
-            <v-icon :icon="store.loading ? 'mdi-loading' : 'mdi-refresh'" :class="{ 'is-spinning': store.loading }" size="16" />
-        </button>
-
         <span class="tv-toolbar__gap" />
 
         <span class="tv-toolbar__count tv-meta">
             {{ store.visible.length }}<template v-if="store.activeFilterCount"> of {{ store.tasks.length }}</template>
             {{ store.visible.length === 1 ? "task" : "tasks" }}
         </span>
+
+        <FilterMenu />
 
         <!-- Column visibility means nothing on a board or a calendar. -->
         <v-menu v-if="store.supportsColumns" :close-on-content-click="false" location="bottom end" offset="4">
@@ -221,7 +122,20 @@ const createdLabel = computed(() => {
                 </button>
             </div>
         </v-menu>
+
+        <button
+            type="button"
+            class="tv-ghost tv-ghost--icon"
+            :disabled="store.loading"
+            title="Refresh"
+            aria-label="Refresh"
+            @click="store.refresh()"
+        >
+            <v-icon :icon="store.loading ? 'mdi-loading' : 'mdi-refresh'" :class="{ 'is-spinning': store.loading }" size="16" />
+        </button>
     </div>
+
+    <ActiveFilters />
 
     <!-- Bulk bar. Appears only with a selection; the same actions in every
          view, because selection survives the switch. -->
@@ -426,31 +340,6 @@ const createdLabel = computed(() => {
 .tv-reset:hover,
 .tv-ghost:hover {
     background: var(--tv-sub);
-}
-
-.tv-arch {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid var(--tv-rule-strong);
-    border-radius: var(--tv-radius);
-    background: var(--tv-paper);
-    font-size: var(--tv-size-meta);
-    color: var(--tv-ink-2);
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.tv-arch--on {
-    border-color: var(--tv-brand);
-    color: var(--tv-ink);
-}
-
-.tv-arch input {
-    margin: 0;
-    accent-color: var(--tv-brand);
 }
 
 .tv-bulk {
