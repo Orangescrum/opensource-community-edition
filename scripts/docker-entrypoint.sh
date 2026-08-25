@@ -36,5 +36,20 @@ printf 'SetEnv SECURITY_SALT "%s"\n' "$SECURITY_SALT" > /etc/apache2/conf-enable
 # pre-creation step). `;` so Apache still starts if the chown is rejected.
 chown www-data:www-data /var/www/html/config/oauth-keys 2>/dev/null || true
 
+# Reassert the upload-directory guard. webroot/files is a named volume, so the
+# copy that ships in the image never reaches an existing install: an upgrade
+# cannot replace it. A stale copy carrying php_admin_flag makes Apache answer
+# 500 for EVERY request under /files/ - no avatar, project logo or attachment
+# is served (public issue #33). This file is ours, not an operator setting, so
+# it is restored unconditionally.
+PRISTINE_FILES_HTACCESS="/usr/local/share/orangescrum/files.htaccess"
+if [ -f "$PRISTINE_FILES_HTACCESS" ]; then
+    if ! cmp -s "$PRISTINE_FILES_HTACCESS" /var/www/html/webroot/files/.htaccess 2>/dev/null; then
+        cp "$PRISTINE_FILES_HTACCESS" /var/www/html/webroot/files/.htaccess
+        chown www-data:www-data /var/www/html/webroot/files/.htaccess 2>/dev/null || true
+        echo "entrypoint: restored webroot/files/.htaccess"
+    fi
+fi
+
 cron
 exec apache2ctl -D FOREGROUND

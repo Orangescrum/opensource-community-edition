@@ -87,5 +87,11 @@ EXPOSE 80
 
 # Entrypoint resolves a stable per-deployment Security.salt (see the script)
 # then launches cron + Apache in the foreground.
+# webroot/files is a Docker named volume, so the .htaccess that ships in the
+# image is hidden the moment the volume mounts over it, and an old broken copy
+# in the volume can never be replaced by an upgrade. Keep a pristine copy
+# outside the mount; the entrypoint reasserts it on every start.
+RUN mkdir -p /usr/local/share/orangescrum &&     cp /var/www/html/webroot/files/.htaccess /usr/local/share/orangescrum/files.htaccess
+
 COPY --chmod=0755 ./scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
