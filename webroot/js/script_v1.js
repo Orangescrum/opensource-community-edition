@@ -7004,9 +7004,16 @@ function doneCropImage() {
         var imgName = $("#imgName1").val();
     else
         var imgName = $("#imgName1-popup").val();
+    /* The spinner used to be shown before this check, with no else branch and no
+       failure handler, so a missing crop selection - or any failed request -
+       left it spinning for ever (public issue #33). Validate first, and always
+       put the button back. */
+    if (width == 0 || height == 0 || imgName.trim() == '') {
+        return;
+    }
     $('#file_confirm_btn_loader').show();
     $('.file_confirm_btn').hide();
-    if (width != 0 && height != 0 && imgName.trim() != '') {
+    {
         $.post(HTTP_ROOT + "users/done_cropimage", {
             'x-cord': x,
             'y-cord': y,
@@ -7035,6 +7042,9 @@ function doneCropImage() {
                     profilePopupCancel();
                 }
             }
+            $('#file_confirm_btn_loader').hide();
+            $('.file_confirm_btn').show();
+        }).fail(function () {
             $('#file_confirm_btn_loader').hide();
             $('.file_confirm_btn').show();
         });
