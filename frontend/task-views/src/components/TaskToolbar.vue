@@ -379,7 +379,7 @@ const createdLabel = computed(() => {
 }
 
 .tv-search input {
-    inline-size: 208px;
+    inline-size: 180px;
     border: 0;
     outline: 0;
     background: transparent;
