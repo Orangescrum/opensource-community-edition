@@ -3532,7 +3532,7 @@ class ProjectsController extends AppController
                 $j = 0;
                 $separator = ',';
                 $chk_coma = $data = fgetcsv($handle, 0, ',');
-                if (count($chk_coma) == 1 && stristr($chk_coma[0], ';')) {
+                if (is_array($chk_coma) && count($chk_coma) == 1 && stristr((string)($chk_coma[0] ?? ''), ';')) {
                     $separator = ';';
                 }
                 rewind($handle);
@@ -3540,31 +3540,28 @@ class ProjectsController extends AppController
                 $j = 0;
 
                 while (($data = fgetcsv($handle, 0, $separator)) !== false) {
+                    if (empty($data[0]) && count($data) == 1) {
+                        continue;
+                    }
                     if (!$i) {
                         // Check for column count
                         if (count($data) >= 1) {
                             $fileds = $data;
                             foreach ($data as $key => $val) {
-                                $header_arr[strtolower($val)] = $key;
+                                $header_arr[strtolower((string)$val)] = $key;
                             }
                         }
                     } else {
                         // Verifing data
-                        if ($pro_id != 'all' && strlen($data[$header_arr['title']] ?? '') != 0) {
+                        $title_idx = $header_arr['title'] ?? ($header_arr['task title'] ?? null);
+                        $project_idx = $header_arr['project'] ?? ($header_arr['project name'] ?? null);
+                        $title_val = $title_idx !== null ? trim((string)($data[$title_idx] ?? '')) : '';
+                        $project_val = $project_idx !== null ? trim((string)($data[$project_idx] ?? '')) : '';
+                        if ($pro_id != 'all' && $title_val !== '') {
                             $value = $data;
-                        } elseif (isset($header_arr['task title']) && strlen($data[$header_arr['task title']] ?? '') != 0) {
+                        } elseif (isset($header_arr['task title']) && trim((string)($data[$header_arr['task title']] ?? '')) !== '') {
                             $value = $data;
-                        } elseif (
-                            $pro_id == 'all' &&
-                            (
-                                strlen($data[$header_arr['project']]) != 0 ||
-                                (isset($header_arr['project name']) && strlen($data[$header_arr['project name']]) != 0)
-                            ) &&
-                            (
-                                strlen($data[$header_arr['title']]) != 0 ||
-                                (isset($header_arr['task title']) && strlen($data[$header_arr['task title']]) != 0)
-                            )
-                        ) {
+                        } elseif ($pro_id == 'all' && $project_val !== '' && $title_val !== '') {
                             $value = $data;
                         } else {
                             continue;
@@ -3712,7 +3709,7 @@ class ProjectsController extends AppController
         $array_milston_ids = [];
         $easycaseTable = $this->fetchTable('Easycases');
         foreach ($project_list as $pkey => $pval) {
-            $project_name[trim(strtolower($this->Format->getProjectName($pval)))] = $this->Format->getProjectName($pval);
+            $project_name[trim(strtolower((string)$this->Format->getProjectName($pval)))] = $this->Format->getProjectName($pval);
             $task_assign_to_userid = $projectUsersTable->find('list', ['keyField' => 'id', 'valueField' => 'user_id', 'conditions' => ['company_id' => SES_COMP, 'project_id' => $pval],])->disableHydration()->toArray();
 
             $task_assign_to_users = $usersTable->find('list', ['keyField' => 'id', 'valueField' => 'email', 'conditions' => ['id IN' => $task_assign_to_userid],])->disableHydration()->toArray();
@@ -3738,7 +3735,8 @@ class ProjectsController extends AppController
             } else {
                 $task_arr_1 = [];
                 foreach ($task_arr as $karr => $varr) {
-                    if (trim(strtolower($varr['project'])) == trim(strtolower($this->Format->getProjectName($pval)))) {
+                    $varr_project = trim(strtolower((string)($varr['project'] ?? ($varr['project name'] ?? ''))));
+                    if ($varr_project == trim(strtolower((string)$this->Format->getProjectName($pval)))) {
                         $task_arr_1[] = $varr;
                     }
                 }
@@ -3829,20 +3827,13 @@ class ProjectsController extends AppController
             }
             if ($map[$con_val]) {
                 $pval = !empty($projectId) ? $projectId : $project_id;
-                if (
-                    (isset($v['taskgroup']) && trim($v['taskgroup']) || isset($v['task group']) && trim($v['task group'])) &&
-                    strtolower(trim($v['taskgroup'])) != 'default'
-                ) {
+                $taskgroup = trim((string)($v['taskgroup'] ?? ($v['task group'] ?? '')));
+                if ($taskgroup !== '' && strtolower($taskgroup) != 'default') {
                     $default = 0;
-                    $milestone_id = !empty($array_milston_ids[$pval][trim($v['taskgroup'])]) ? $array_milston_ids[$pval][trim($v['taskgroup'])] : '';
-                    if (empty($milestone_id)) {
-                        if (isset($v['task group'])) {
-                            $milestone_id = $array_milston_ids[$pval][trim($v['task group'])];
-                        }
-                    }
-                } elseif ($k == 0 && (trim($v['taskgroup'] ?? '') == '' || (isset($v['task group']) && trim($v['task group']) == ''))) {
+                    $milestone_id = $array_milston_ids[$pval][$taskgroup] ?? '';
+                } elseif ($k == 0 && $taskgroup == '') {
                     $default = 1;
-                } elseif (strtolower(trim($v['taskgroup'] ?? '')) == 'default' || (isset($v['task group']) && strtolower(trim($v['task group'])) == 'default')) {
+                } elseif (strtolower($taskgroup) == 'default') {
                     $default = 1;
                 }
 
@@ -3853,11 +3844,11 @@ class ProjectsController extends AppController
                     $task_data_arr = array_flip($task_data_arr);
                     $task_data_arr = array_change_key_case($task_data_arr, CASE_LOWER);
                 }
-                if (!trim($v['title']) && !trim($v['task title'])) {
+                if (!trim((string)($v['title'] ?? '')) && !trim((string)($v['task title'] ?? ''))) {
                     continue;
                 }
                 $title = !empty($v['title']) ? $this->Format->contains_any_multibyte($v['title']) ? mb_convert_encoding($v['title'], 'UTF-8', 'ISO-8859-1') : mb_convert_encoding($v['title'], 'UTF-8', 'ISO-8859-1') : '';
-                $easycase['title'] = empty($title) ? $v['task title'] : $title;
+                $easycase['title'] = empty($title) ? (string)($v['task title'] ?? '') : $title;
                 $easycase['title'] = substr($easycase['title'], 0, 240);
                 if (empty($easycase['title'])) {
                     continue;
@@ -3939,20 +3930,8 @@ class ProjectsController extends AppController
                 }
 
                 $easycase['project_id'] = $pval;
-                if (!isset($v['created by'])) {
-                    $easycase['user_id'] = (isset($user_list[trim($v['created by'] ?? '')]) && !empty($user_list[trim($v['created by'] ?? '')])) ? $user_list[trim($v['created by'])] : SES_ID;
-                } else {
-                    if (strtolower($v['created by']) != 'me' && $v['created by']) {
-                        if (!empty($asigne_users_list) && array_search($v['created by'], $asigne_users_list)) {
-                            $easycase['user_id'] = array_search($v['user_id'], $asigne_users_list);
-                        } else {
-                            $easycase['user_id'] = SES_ID;
-                        }
-                    } else {
-                        $easycase['user_id'] = SES_ID;
-                    }
-                }
-                $easycase['user_id'] = (isset($user_list[trim($v['created by'])]) && !empty($user_list[trim($v['created by'])])) ? $user_list[trim($v['created by'])] : SES_ID;
+                $created_by = trim((string)($v['created by'] ?? ''));
+                $easycase['user_id'] = !empty($user_list[$created_by]) ? $user_list[$created_by] : SES_ID;
 
                 $priority = match (strtolower($v['priority'] ?? '')) {
                     'high' => 0,
@@ -4020,8 +3999,8 @@ class ProjectsController extends AppController
                 $entity = $easycaseTable->newEntity($easycase);
                 $sid = $easycaseTable->save($entity);
                 if ($sid) {
-                    $easycase_inserted_ids[$sid->get('project_id')][$v['task#']] = $sid->get('id');
-                    $easycase_inserted_parents[$sid->get('project_id')][$sid->get('id')] = $v['parent'];
+                    $easycase_inserted_ids[$sid->get('project_id')][$v['task#'] ?? ''] = $sid->get('id');
+                    $easycase_inserted_parents[$sid->get('project_id')][$sid->get('id')] = $v['parent'] ?? '';
                     $no_task++;
                     $history[$hind++]['total_task'] = $no_task;
                     $total_valid_rows = $no_task;
@@ -4048,7 +4027,7 @@ class ProjectsController extends AppController
                         'assignTo' => $easycase['assign_to'],
                         'str_date' => $easycase['gantt_start_date'],
                         'CS_due_date' => $easycase['due_date'],
-                        'est_hr' => $v['estimated hour']
+                        'est_hr' => $v['estimated hour'] ?? ''
                     ];
 
                     if (!$default && $milestone_id != '') {
