@@ -1568,13 +1568,19 @@ class AppController extends Controller
     protected function validateUserExists(int $userId): void
     {
         $usersTable = $this->fetchTable('Users');
-        $userExists = $usersTable->find()
-            ->where(['id' => $userId])
+        // Re-check eligibility through the same 'auth' finder the login flow
+        // uses (active user + at least one active/pending company membership),
+        // not just row existence. This rejects a session on the next request
+        // when the account was deleted OR disabled after the session was
+        // issued, so a disabled user cannot keep using an already-open session.
+        $eligible = $usersTable->find('auth')
+            ->where(['Users.id' => $userId])
             ->count();
 
-        if (!$userExists) {
-            // User was deleted but session still active - log them out
-            Log::warning("User {$userId} session exists but user record deleted - forcing logout");
+        if (!$eligible) {
+            // User was deleted or disabled but the session is still active -
+            // log them out.
+            Log::warning("User {$userId} session exists but account is no longer eligible (deleted or disabled) - forcing logout");
 
             // Clear authentication and session
             $this->Authentication->logout();
