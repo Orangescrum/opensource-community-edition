@@ -42,6 +42,7 @@ use Cake\Validation\Validator;
 use App\Controller\Component\FormatComponent;
 use App\Controller\Component\TmzoneComponent;
 use App\Model\Entity\UserNotification;
+use App\Model\Table\CompanyUsersTable;
 use App\Utility\CommonUtility;
 use Cake\Auth\DefaultPasswordHasher;
 use EmailTemplating\Mailer\TemplatedMailer;
@@ -784,6 +785,29 @@ class UsersTable extends Table
         //     UsersController::login).
         // Users awaiting email-invite acceptance still have NULL password,
         // so they remain locked out here — preserving the original intent.
+        // The user must ALSO still belong to at least one company with a
+        // membership that is active or awaiting first-login confirmation.
+        // This is what makes an admin "disable user" actually block sign-in:
+        // deactivateUser() flips CompanyUsers.is_active to STATUS_INACTIVE (0)
+        // while leaving the global Users.isactive at 1, so filtering on
+        // isactive alone is not enough. STATUS_DELETED (3) is likewise
+        // excluded. The previous leftJoinWith() only nulled the joined columns
+        // and never removed the row, which is why disabled accounts could still
+        // authenticate.
+        //
+        // Expressed as an IN sub-query rather than a join so the finder cannot
+        // return duplicate User rows for someone who is active in more than one
+        // company, and the check runs on every authentication attempt (no
+        // cached/stale membership window).
+        $eligibleMembership = $this->CompanyUsers->find()
+            ->select(['CompanyUsers.user_id'])
+            ->where([
+                'CompanyUsers.is_active IN' => [
+                    CompanyUsersTable::STATUS_ACTIVE,
+                    CompanyUsersTable::STATUS_NOT_CONFIRMED,
+                ],
+            ]);
+
         $query->where([
                 'OR' => [
                     ['Users.isactive' => 1],
@@ -792,11 +816,9 @@ class UsersTable extends Table
                         'Users.password IS NOT' => null,
                     ],
                 ],
+                'Users.id IN' => $eligibleMembership,
             ])
-            ->select($this)
-            ->leftJoinWith('CompanyUsers', function ($q) {
-                return $q->where(['CompanyUsers.is_active' => 1]);
-            });
+            ->select($this);
 
         // Email casing is normalized in two places that together cover the
         // identifier's `WHERE email = ?` lookup:

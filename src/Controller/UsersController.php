@@ -131,7 +131,10 @@ class UsersController extends AppController
         $session->delete('auto_login_company_id');
 
         $usersTable = $this->fetchTable('Users');
-        $user = $usersTable->get($userId);
+        // Resolve through the same eligibility finder the password login uses,
+        // so a disabled account (no active company membership) cannot obtain a
+        // session through the auto-login link either.
+        $user = $usersTable->find('auth')->where(['Users.id' => $userId])->first();
 
         if (!$user) {
             $this->Flash->error('User not found. Please login manually.');
@@ -581,9 +584,35 @@ class UsersController extends AppController
                 // No active companies - redirect to launchpad (orphaned user scenario)
                 return $this->redirect(['controller' => 'Users', 'action' => 'launchpad']);
             } else {
-                // Intentionally generic (no "no such email" vs "wrong
-                // password" split) to avoid user-enumeration attacks.
-                $this->Flash->error(__("We couldn't sign you in. Please check that your email and password are correct."));
+                // Default to the intentionally generic message (no "no such
+                // email" vs "wrong password" split) to avoid user-enumeration
+                // attacks.
+                $failureMessage = __("We couldn't sign you in. Please check that your email and password are correct.");
+
+                // If the credentials are in fact correct but the account has
+                // been disabled - an admin deactivated it, so it has no active
+                // company membership and the `auth` finder filters it out - say
+                // so explicitly. The user has already proven ownership by
+                // supplying the right password, so this is not an enumeration
+                // risk, and the generic "check your password" message would be
+                // misleading (their password is fine).
+                $submittedEmail = strtolower(trim((string)$this->request->getData('email')));
+                $submittedPassword = (string)$this->request->getData('password');
+                if ($submittedEmail !== '' && $submittedPassword !== '') {
+                    $account = $this->Users->find()
+                        ->where(['Users.email' => $submittedEmail])
+                        ->first();
+                    if (
+                        $account
+                        && !empty($account->password)
+                        && (new DefaultPasswordHasher())->check($submittedPassword, $account->password)
+                        && $this->Users->find('auth')->where(['Users.id' => $account->id])->count() === 0
+                    ) {
+                        $failureMessage = __('Your account has been disabled. Please contact your administrator to regain access.');
+                    }
+                }
+
+                $this->Flash->error($failureMessage);
             }
         }
 
