@@ -3099,13 +3099,34 @@ class UsersController extends AppController
 
 
             if ($userInfo->isDirty()) {
-                $this->Users->save($userInfo);
+                $saved = $this->Users->save($userInfo);
                 if ($is_language_changed) {
                     $languagesTable->setUserLocale($userInfo->language);
                 }
                 if (isset($is_timezone_changed) && $is_timezone_changed) {
                     Cache::delete("SES_TIMEZONE_{$userInfo->id}");
                 }
+
+                /*
+                 * Keep the logged-in user's session identity in step with the
+                 * row we just wrote. The identity is a snapshot taken at login;
+                 * AppController reads it back into USERNAME / USEREMAIL /
+                 * USERSHORTNAME and the `usrdata` view var. Without this the
+                 * header and other identity-sourced spots keep showing the
+                 * pre-edit name (last name included) until the user signs out
+                 * and back in - even though the database, and the profile form
+                 * itself, already hold the new values (public issue: profile
+                 * changes not reflected until re-login).
+                 *
+                 * Only refresh when the user is editing their OWN profile. On
+                 * the ajax manage-users path an admin can edit a different
+                 * user, and re-persisting that entity would hijack the admin's
+                 * own identity.
+                 */
+                if ($saved && defined('SES_ID') && (int)$userInfo->id === (int)SES_ID) {
+                    $this->Authentication->setIdentity($userInfo);
+                }
+
                 $msg['error'] = ($email_update) ? __("Profile updated successfully. Sign in with {0} from now on.", $update_email) : __('Profile updated successfully');
                 $msg['close'] = 1;
             }
@@ -3121,8 +3142,17 @@ class UsersController extends AppController
                 // save user profile from user manage page
                 return $this->jsonResponse(json_encode($msg));
             }
-            // save current user from profile page
-            #return $this->redirect(['action' => 'profile']);
+
+            // Save from the profile page (non-ajax). Surface the outcome as a
+            // flash message the footer renders as a toast, then redirect
+            // (Post/Redirect/Get) so a refresh does not re-submit the form and
+            // the confirmation shows on the reloaded page. `close` is 1 on a
+            // successful save and 0 when the catch above set an error message.
+            if (!empty($msg['error'])) {
+                $flashKey = empty($msg['close']) ? 'ERROR' : 'SUCCESS';
+                $this->getRequest()->getSession()->write($flashKey, $msg['error']);
+            }
+            return $this->redirect(['action' => 'profile']);
         }
 
         // render the profile page
