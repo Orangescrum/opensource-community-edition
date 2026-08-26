@@ -960,7 +960,15 @@ class UsersController extends AppController
                 $supportEmail = Configure::read('AppEmail.notify_email')
                     ?: Configure::read('AppEmail.from_email', '');
                 try {
-                    TemplatedMailer::deliver($mailer, 'forgot_password', $companyId ? (int)$companyId : null, [
+                    /*
+                     * TemplatedMailer catches every Throwable internally and
+                     * reports the outcome in its return value, so the catch
+                     * blocks below never see a transport failure. Read the
+                     * result: without this the screen said "check your mail"
+                     * even when the mail server was unreachable and nothing had
+                     * been sent (public issue #39).
+                     */
+                    $sent = TemplatedMailer::deliver($mailer, 'forgot_password', $companyId ? (int)$companyId : null, [
                         'userName' => $name,
                         'actorName' => $name,
                         'resetUrl' => $resetUrl,
@@ -968,29 +976,44 @@ class UsersController extends AppController
                         'companyName' => \EmailTemplating\Service\GlobalSettings::companyName($companyId ? (int)$companyId : null),
                         'supportEmail' => $supportEmail,
                     ]);
+                    if (!$sent) {
+                        $this->Flash->error(__('We could not send the reset email. The mail server did not accept it - please contact your administrator.'));
+
+                        return $this->redirect(['controller' => 'Users', 'action' => 'forgotPassword']);
+                    }
+
                     $this->Users->updateAll(
                         ['query_string' => $qstr],
                         ['id' => $id]
                     );
-                    $session->write('SUCCESS', __('Please check your mail to reset your password'));
+                    $this->Flash->success(__('Please check your mail to reset your password'));
                     return $this->redirect([
                         'controller' => 'Users',
                         'action' => 'login',
                     ]);
                 } catch (SocketException $e) {
                     Log::error('SocketException: ' . $e->getMessage(), 'email_exceptions');
+                    $this->Flash->error(__('We could not send the reset email. The mail server is not reachable - please contact your administrator.'));
+                    return $this->redirect(['controller' => 'Users', 'action' => 'forgotPassword']);
                 } catch (Exception $e) {
                     Log::error('Exception: ' . $e->getMessage());
+                    $this->Flash->error(__('We could not send the reset email. Please try again, or contact your administrator.'));
+                    return $this->redirect(['controller' => 'Users', 'action' => 'forgotPassword']);
                 }
             } else {
-                $session->write(
-                    'ERROR',
-                    sprintf(
-                        '%s %s',
-                        __("If an account exists with this email address, we've sent instructions on resetting your password."),
-                        __('Please check your email!')
-                    )
-                );
+                /*
+                 * Deliberately the same wording whether or not the address is
+                 * registered, so this cannot be used to discover accounts.
+                 * Sent through Flash because that is what the template renders
+                 * - a raw SUCCESS/ERROR session key is read by nothing on these
+                 * pages, which is why the screen used to sit there silently
+                 * (public issues #39 and #40).
+                 */
+                $this->Flash->success(sprintf(
+                    '%s %s',
+                    __("If an account exists with this email address, we've sent instructions on resetting your password."),
+                    __('Please check your email!')
+                ));
                 return $this->redirect([
                     'controller' => 'Users',
                     'action' => 'forgotPassword',
@@ -1062,7 +1085,7 @@ class UsersController extends AppController
                             $companyUsers = $this->fetchTable('CompanyUsers');
                             $companyUsers->updateUserPerm(0, $postData['user_id'], 2);
                             $this->set('chkemail', '11');
-                            $session->write('SUCCESS', __('Password Has been Updated. Use your email and password to login.'));
+                            $this->Flash->success(__('Password Has been Updated. Use your email and password to login.'));
                             return $this->redirect(['Controller' => 'Users', 'action' => 'login']);
                         }
                     }
