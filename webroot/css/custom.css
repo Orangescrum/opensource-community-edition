@@ -7561,3 +7561,15 @@ ul.dropdown-menu.right0.new-dropdown{cursor:pointer}
 li.theme_navli > .dropdown-menu {
     z-index: 1002;
 }
+
+/* Public issue #44 — the Subtask (and Dependents) popover on the task list was
+   drawn underneath the sticky column header, so its first line was unreadable.
+   Both popovers are z-index:10, the same as the sticky `th`, but they sit
+   inside .task_dependancy_item, which is position:relative;z-index:1 and so
+   opens a stacking context: the whole popover is painted at level 1 and loses
+   to the header at 10. Lift the item itself, and only while a popover is open,
+   so a closed row still passes under the header when the list scrolls. */
+.title-dependancy-all .task_dependancy_item:has(.showParents.open),
+.title-dependancy-all .task_dependancy_item:has(.showDependents.open) {
+    z-index: 20;
+}
