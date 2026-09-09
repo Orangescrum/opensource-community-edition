@@ -4300,7 +4300,9 @@ class UsersController extends AppController
             $inviteToken = $query['token'];
         }
 
-        if (!trim($qstr) && empty($inviteToken)) {
+        // $qstr is null when the link carries only ?token=, so it cannot be
+        // passed to trim() unguarded.
+        if (!trim((string)$qstr) && empty($inviteToken)) {
             $this->Flash->error(__('Invalid invitation link.'));
             return $this->redirect(['action' => 'login']);
         }
@@ -4383,13 +4385,20 @@ class UsersController extends AppController
             $hasher = new DefaultPasswordHasher();
             $hashedPassword = $hasher->hash($password);
 
+            /*
+             * No last_password_changed here: the users table has no such
+             * column in this edition - it belongs to the password-policy
+             * plugin, which is not shipped. With no column to type it against,
+             * CakePHP treated the value as a string and threw "Cannot convert
+             * value of type DateTime to string", so accepting an invitation
+             * always ended in a 500 (public issue #45).
+             */
             $userTable->updateAll(
                 [
                     'password' => $hashedPassword,
                     'isactive' => 1,
                     'timezone_id' => (int) $timezoneId,
                     'dt_last_login' => GMT_DATETIME,
-                    'last_password_changed' => new \DateTime(),
                 ],
                 ['id' => $ui['user_id']]
             );
