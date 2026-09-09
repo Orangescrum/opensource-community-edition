@@ -110,7 +110,7 @@ $sortHeader = function (string $label, string $sortKey)
                                 <a class="dropdown-toggle active" data-toggle="dropdown" href="javascript:void(0);" data-target="#">
                                     <i class="material-icons">&#xE5D4;</i>
                                 </a>
-                                <ul class="dropdown-menu left0 new-dropdown">
+                                <ul class="dropdown-menu left0 new-dropdown usr-actions-menu">
                                     <?php echo $this->element('user_actions_menu_items', ['menuUser' => $listUser, 'idSuffix' => 'l']); ?>
                                 </ul>
                             </span>

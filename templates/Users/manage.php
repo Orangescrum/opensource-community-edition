@@ -379,6 +379,34 @@ endif; ?>
     // Posts to /users/admin-reset-password (no SMTP). Validates min 8 +
     // confirm-match client side; server re-validates.
     // -------------------------------------------------------------------
+    /*
+     * Choosing an action closes its menu.
+     *
+     * Something on this page stops click propagation inside .dropdown-menu, so
+     * Bootstrap's own close handler - which listens on document - never runs
+     * and the menu stayed open on top of whatever the action opened. It is
+     * most visible with Reset Password, whose modal is narrow enough that the
+     * menu covers the password fields (public issue #46), but every item in
+     * this menu left it open.
+     *
+     * Scoped to .usr-actions-menu on purpose: other dropdowns on the site hold
+     * checkboxes and filters that must stay open while they are used.
+     *
+     * Listening in the capture phase, not on a delegated bubble handler - the
+     * bubble never reaches document here, which is the whole reason Bootstrap
+     * could not close it either.
+     */
+    document.addEventListener('click', function (e) {
+        var link = e.target && e.target.closest ? e.target.closest('.usr-actions-menu a') : null;
+        if (!link) {
+            return;
+        }
+        var dd = link.closest('.dropdown');
+        if (dd) {
+            dd.classList.remove('open');
+        }
+    }, true);
+
     function openAdminResetPassword(userId, userName) {
         $('#admin_reset_pw_user_id').val(userId);
         $('#admin_reset_pw_user_label').text(userName || '');

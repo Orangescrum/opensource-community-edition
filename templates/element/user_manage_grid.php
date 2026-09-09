@@ -52,7 +52,7 @@ $is_invited_user = ($role === 'invited') ? 1 : 0;
                         <a class="dropdown-toggle active" data-toggle="dropdown" href="javascript:void(0);" data-target="#">
                             <i class="material-icons">&#xE5D4;</i>
                         </a>
-                        <ul class="dropdown-menu right0 new-dropdown">
+                        <ul class="dropdown-menu right0 new-dropdown usr-actions-menu">
                             <?php if ($user['CompanyUsers']['user_type'] == 1 || ($user['CompanyUsers']['user_type'] == 2 && SES_ID == $user['id'])): ?>
                                 <?php if ($this->Format->isAllowed('Assign Project', $roleAccess)): ?>
                                     <li><a class="icon-assign-usr" href="javascript:void(0);" data-usr-id="<?php echo $user['id']; ?>" data-usr-name="<?php echo $user['name']; ?>"><i class="material-icons">&#xE85D;</i> <?php echo __('Assign Project'); ?></a></li>
