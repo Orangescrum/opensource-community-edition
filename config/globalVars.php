@@ -2,8 +2,8 @@
 
 define('RELEASE', 4);
 define('ASSET_RELEASE', '95'); // Change asset release on every css/js change
-define('RELEASE_VESION', 'v0.1.12');
-define('RELEASE_VERSION', 'v0.1.12');
+define('RELEASE_VESION', 'v0.1.13');
+define('RELEASE_VERSION', 'v0.1.13');
 define('SHOW_ARABIC', 0);
 
 // Orangescrum Marketing Website URL
@@ -17,7 +17,7 @@ define('EDITION_NAME', 'Open Source Community Edition');
 // Displayed version. Kept here (bind-mounted, tracked) rather than only in
 // VERSION.txt, which is baked into the Docker image and can go stale until a
 // rebuild — the About/What's New pages prefer this constant.
-define('EDITION_VERSION', '0.1.12');
+define('EDITION_VERSION', '0.1.13');
 define('EDITION_VENDOR', 'Andolasoft Inc.');
 define('EDITION_VENDOR_URL', 'https://www.andolasoft.com/');
 define('EDITION_LICENSE_SPDX', 'AGPL-3.0-or-later');
