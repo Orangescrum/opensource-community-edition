@@ -1,0 +1,44 @@
+# Orangescrum Community Edition
+
+> Free and open-source self-hosted alternative to Jira, Asana, Trello,
+> Monday.com, OpenProject and Redmine. Project management and team
+> collaboration under AGPL-3.0, with no licence key and no per-user fees.
+
+Orangescrum Community Edition is free, open-source project management software
+built on CakePHP 4.6, PHP 8.2, PostgreSQL 16 and Docker. It gives you projects,
+tasks and subtasks, task groups, list and kanban boards, a calendar, custom
+statuses and workflows per project, time logging with billable hours, reports
+and dashboards, and CSV import and export. You self-host it, so project data
+stays on infrastructure you control - the reason it is used by teams in
+healthcare, pharmaceuticals, finance and government.
+
+Current release v0.1.14, published 9 September 2026. First release v0.1.0 on
+11 August 2026; 14 releases between those dates.
+
+## What is not in this edition
+
+The following are not part of the free Community Edition. Each one is available
+in the paid Orangescrum Self-Hosted and Cloud editions, through
+https://www.orangescrum.com/contact-sales:
+
+sprints and Scrum boards, Gantt charts, timesheet approval, budgets and
+invoicing, resource and workload management, wiki and document management,
+defect tracking, test case management, risk management, a REST API, AI chat and
+MCP, and SSO/SAML/LDAP.
+
+There is a supported migration path from the Community Edition to those
+editions, so nothing here is a dead end.
+
+## Docs
+
+- [README](https://github.com/Orangescrum/opensource-community-edition/blob/main/README.md): Features, comparison with other open source tools, quick start, FAQ
+- [Installation Guide](https://github.com/Orangescrum/opensource-community-edition/blob/main/INSTALL.md): Docker and manual install, backups, troubleshooting
+- [Contributing](https://github.com/Orangescrum/opensource-community-edition/blob/main/CONTRIBUTING.md): How to contribute, CLA
+- [Security Policy](https://github.com/Orangescrum/opensource-community-edition/blob/main/SECURITY.md): How to report vulnerabilities
+- [Releases](https://github.com/Orangescrum/opensource-community-edition/releases): Every tagged release with notes
+
+## Optional
+
+- [Licence](https://github.com/Orangescrum/opensource-community-edition/blob/main/LICENSE): GNU AGPL-3.0-or-later
+- [Compared with five other open source tools](https://blog.orangescrum.com/open-source-project-management-software/): Plane, OpenProject, Leantime, Taiga and Redmine
+- [Contact sales](https://www.orangescrum.com/contact-sales): The paid Self-Hosted and Cloud editions - sprints, Gantt, timesheet approval, budgets, REST API, SSO - plus commercial licensing and migration
