@@ -1029,8 +1029,75 @@ class EasycasesController extends AppController
         exit;
     }
 
+    /**
+     * Stored attachment names are the only thing identifying a file in the
+     * download URLs, so every lookup below is scoped to the caller's company and
+     * the caller's project membership is checked before any bytes are served.
+     * Without this, knowing (or guessing) a stored name was enough to read any
+     * tenant's attachment.
+     *
+     * @param array<string, mixed>|null $row A case_files / case_editor_files row.
+     * @return bool
+     */
+    protected function mayDownloadAttachment(?array $row): bool
+    {
+        if (empty($row) || empty($row['project_id'])) {
+            return false;
+        }
+
+        if ((string)($row['company_id'] ?? '') !== (string)SES_COMP) {
+            return false;
+        }
+
+        $projectUsersTable = $this->fetchTable('ProjectUsers');
+        $member = $projectUsersTable->find()
+            ->select(['ProjectUsers.id'])
+            ->where([
+                'ProjectUsers.user_id' => SES_ID,
+                'ProjectUsers.company_id' => SES_COMP,
+                'ProjectUsers.project_id' => $row['project_id'],
+            ])
+            ->disableAutoFields()
+            ->disableHydration()
+            ->first();
+
+        return !empty($member);
+    }
+
+    /**
+     * Records a freshly uploaded temp file against the uploader's session so
+     * downloadPrevewfiles() can authorise it. Temp files have no database row,
+     * so the session is the only thing that ties one to a user.
+     *
+     * @param string $newFileName The generated temp file name.
+     * @param string $displayName The sanitised original name, used by fileupload()
+     *   to build the `<display>__utf__<stored>` form it hands back to the browser
+     *   for UTF-8 filenames. Registered too so that form stays servable.
+     * @return void
+     */
+    protected function rememberPreviewUpload(string $newFileName, string $displayName = ''): void
+    {
+        $session = $this->getRequest()->getSession();
+        $names = (array)$session->read('PREVIEW_UPLOADS', []);
+        $names[] = $newFileName;
+        $names[] = 'thumb_' . $newFileName;
+        if ($displayName !== '') {
+            $names[] = $displayName . '__utf__' . $newFileName;
+        }
+        // Keep the list bounded — a long-lived session would otherwise grow it
+        // without limit.
+        if (count($names) > 600) {
+            $names = array_slice($names, -600);
+        }
+        $session->write('PREVIEW_UPLOADS', array_values(array_unique($names)));
+    }
+
     public function downloadfiles($files = null)
     {
+        if (empty($files)) {
+            return $this->response->withStringBody('File not found')->withStatus(404);
+        }
+
         $caseFilesTable = $this->fetchTable('CaseFiles');
 
         $getFiles = $caseFilesTable->findByUploadName($files)->disableHydration()->disableResultsCasting()->first();
@@ -1038,29 +1105,44 @@ class EasycasesController extends AppController
 
         $orig_name = null;
         if (!empty($getFiles)) {
+            if (!$this->mayDownloadAttachment($getFiles)) {
+                return $this->response->withStringBody('File not found')->withStatus(404);
+            }
             $orig_name = (empty($getFiles['display_name'])) ? $getFiles['file'] : $getFiles['display_name'];
             return $this->Format->downloadFile($files, $orig_name);
         } elseif (empty($getFiles) && !empty($getoldFiles)) {
+            if (!$this->mayDownloadAttachment($getoldFiles)) {
+                return $this->response->withStringBody('File not found')->withStatus(404);
+            }
             $orig_name = (empty($getFiles['display_name'])) ? $getoldFiles['file'] : $getoldFiles['display_name'];
             return $this->Format->downloadFile($files, $orig_name);
         } else {
             $caseEditorFilesTable = $this->fetchTable('CaseEditorFiles');
             $getEdtrFiles = $caseEditorFilesTable->findByName($files)->disableHydration()->disableResultsCasting()->first();
-            if (!empty($getEdtrFiles)) {
-                return $this->Format->downloadFile($files, $getoldFiles['name'], 1);
+            if (!empty($getEdtrFiles) && $this->mayDownloadAttachment($getEdtrFiles)) {
+                return $this->Format->downloadFile($files, $getEdtrFiles['name'], 1);
             } else {
-                return $this->response->withStringBody("$files has been moved permanently")->withStatus(404);
+                return $this->response->withStringBody('File not found')->withStatus(404);
             }
         }
     }
 
     public function downloadPrevewfiles($files = null)
     {
-        if (!empty($files)) {
-            return $this->Format->downloadTMpFile($files);
-        } else {
-            return $this->response->withStringBody("$files has been moved permanently")->withStatus(404);
+        // Uploaded names are put through FormatComponent::chnageUploadedFileName()
+        // before they reach the temp directory, so anything outside this charset
+        // was not written by the upload handler. Rejecting it here is what stops
+        // a crafted name traversing out of case_files/temp/.
+        if (empty($files) || !preg_match('/^[A-Za-z0-9._-]+$/', (string)$files) || str_contains((string)$files, '..')) {
+            return $this->response->withStringBody('File not found')->withStatus(404);
         }
+
+        $allowed = (array)$this->getRequest()->getSession()->read('PREVIEW_UPLOADS', []);
+        if (!in_array($files, $allowed, true)) {
+            return $this->response->withStringBody('File not found')->withStatus(404);
+        }
+
+        return $this->Format->downloadTMpFile($files);
     }
 
     public function viewPdfFile($id = null)
@@ -1078,11 +1160,14 @@ class EasycasesController extends AppController
             return $this->response->withStringBody(json_encode($ret));
         }
 
+        // This checked ProjectUsers.user_id against the file's *uploader*, which
+        // is true for any attachment and so authorised nobody. It has to be the
+        // requesting user.
         $projArr = $projectUsersTable->find('all', [
             'conditions' => [
                 'ProjectUsers.project_id' => $getFiles['project_id'],
                 'Projects.isactive' => 1,
-                'ProjectUsers.user_id' => $getFiles['user_id']
+                'ProjectUsers.user_id' => SES_ID
             ]
         ])->join([
                     'table' => 'projects',
@@ -1248,6 +1333,12 @@ class EasycasesController extends AppController
                             ->first();
                         $newFileName = $onlyfile . '-' . md5(mt_rand() . uniqid()) . '.' . $ext1;
                         $updateData = '|' . $sizeinkb . '|' . ($checkFile ? $checkFile->id : 0) . '|' . $name;
+                        // A file in case_files/temp/ has no database row yet, so
+                        // there is no project to authorise a preview download
+                        // against. Record it against the uploader's session
+                        // instead; downloadPrevewfiles() serves only names it
+                        // finds here.
+                        $this->rememberPreviewUpload($newFileName, (string)$t_displayname);
                         try {
                             /* converting tif to png */
                             !is_dir(WWW_ROOT . 'temp' . DS) ? mkdir(WWW_ROOT . 'temp' . DS, 0777, true) : '';
