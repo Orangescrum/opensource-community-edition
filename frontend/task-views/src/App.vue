@@ -10,8 +10,15 @@ import CalendarPage from "@/pages/CalendarPage.vue";
 import OverviewPage from "@/pages/OverviewPage.vue";
 import SubtasksPage from "@/pages/SubtasksPage.vue";
 import MyWorksPage from "@/pages/MyWorksPage.vue";
+import CommandPalette from "@/components/CommandPalette.vue";
+import ShortcutsHelp from "@/components/ShortcutsHelp.vue";
+import { useCommandPalette } from "@/composables/useCommandPalette";
 
 const store = useTaskStore();
+
+// Registers the global Ctrl/Cmd+K and ? key bindings (once) and lets the
+// header button open the palette.
+const { openPalette } = useCommandPalette();
 
 /**
  * Which page this mount renders — set per-route by the host template
@@ -155,6 +162,15 @@ onBeforeUnmount(() => {
                 <ViewSwitcher v-if="showViewSwitcher" />
                 <button
                     type="button"
+                    class="tv-more"
+                    title="Search & commands (Ctrl/⌘ + K)"
+                    aria-label="Search and commands"
+                    @click="openPalette"
+                >
+                    <v-icon icon="mdi-magnify" size="16" aria-hidden="true" />
+                </button>
+                <button
+                    type="button"
                     class="tv-secondary"
                     @click="createTaskGroup"
                 >
@@ -234,6 +250,11 @@ onBeforeUnmount(() => {
 
             <component :is="pageComponent" v-else />
         </main>
+
+        <!-- Global keyboard entry points: Ctrl/Cmd+K palette and the ? help
+             overlay. Both are Vuetify dialogs, so they teleport to <body>. -->
+        <CommandPalette />
+        <ShortcutsHelp />
     </div>
 </template>
 
