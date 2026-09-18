@@ -65,6 +65,9 @@
     "prefer-stable": true,
     "config": {
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        },
         "allow-plugins": {
             "cakephp/plugin-installer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,

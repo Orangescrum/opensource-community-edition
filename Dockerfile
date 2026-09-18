@@ -32,8 +32,11 @@ WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html
 
-# Copy only Composer files first (to leverage caching)
-COPY composer.json ./
+# Copy only Composer files first (to leverage caching). composer.lock must come
+# with composer.json — without it `composer install` re-resolves every
+# dependency at build time and two builds of the same commit can ship different
+# versions.
+COPY composer.json composer.lock ./
 
 RUN su www-data -s /bin/bash -c "composer install --no-dev --optimize-autoloader --no-interaction"
 RUN su www-data -s /bin/bash -c "composer clear-cache"

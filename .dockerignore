@@ -17,7 +17,6 @@
 .vscode/
 *.sublime-project
 *.sublime-workspace
-composer.lock
 composer.phar
 config/app_local.php
 config/install.ini

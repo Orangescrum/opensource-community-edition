@@ -102,7 +102,6 @@ nbproject/*
 yarn-debug.log
 yarn-error.log
 
-composer.lock
 composer.phar
 webroot/files/case_files/*
 webroot/files/case_files/temp/*
