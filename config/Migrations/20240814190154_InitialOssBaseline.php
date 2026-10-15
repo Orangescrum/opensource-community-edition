@@ -26,6 +26,12 @@ class InitialOssBaseline extends AbstractMigration
             throw new \RuntimeException('InitialOssBaseline.sql is missing or empty.');
         }
         $this->execute($sql);
+
+        // The dump starts with set_config('search_path', '', false), which lasts
+        // for the whole connection. Restore the default so migrations that run
+        // after this one (and the installer, which reuses the connection) can
+        // use unqualified table names.
+        $this->execute("SELECT pg_catalog.set_config('search_path', '\"\$user\", public', false)");
     }
 
     /**

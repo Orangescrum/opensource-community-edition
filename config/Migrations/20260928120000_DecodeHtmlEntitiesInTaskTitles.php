@@ -29,7 +29,7 @@ class DecodeHtmlEntitiesInTaskTitles extends AbstractMigration
     public function up(): void
     {
         $rows = $this->fetchAll(
-            "SELECT id, title FROM easycases WHERE title ~ '&(quot|apos|amp|#0?3[49]);'"
+            "SELECT id, title FROM public.easycases WHERE title ~ '&(quot|apos|amp|#0?3[49]);'"
         );
 
         foreach ($rows as $row) {
@@ -39,7 +39,7 @@ class DecodeHtmlEntitiesInTaskTitles extends AbstractMigration
                 continue;
             }
             $this->getQueryBuilder()
-                ->update('easycases')
+                ->update('public.easycases')
                 ->set('title', $decoded)
                 ->where(['id' => (int)$row['id']])
                 ->execute();
