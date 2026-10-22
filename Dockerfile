@@ -3,7 +3,7 @@ FROM ubuntu:noble
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install PHP 8 + Apache + required extensions + runtime tools
-RUN apt-get update && \
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         apache2 libapache2-mod-php8.3 \
         php8.3 php8.3-cli \
