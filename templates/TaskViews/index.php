@@ -43,6 +43,17 @@ $nav[] = ['key' => 'overview', 'label' => __('Overview'), 'url' => HTTP_ROOT . '
 // above are the task UI. No "Classic view" link — it only bounced users to a
 // dead route.
 $legacyList = null;
+
+/*
+ * Role checks the bundle needs but cannot make itself. `viewAllTasks` means the
+ * user sees other people's tasks (all tasks, or every resource), so narrowing
+ * to their own is always meaningful — the calendar offers its My Task toggle on
+ * that basis.
+ */
+$permissions = [
+    'viewAllTasks' => $this->Format->isAllowed('View All Task', $roleAccess)
+        || $this->Format->isAllowed('View All Resource', $roleAccess),
+];
 ?>
 
 <div class="task-views-host">
@@ -57,6 +68,7 @@ $legacyList = null;
         preferences: <?php echo json_encode((object)($preferences ?? []), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
         savedViews: <?php echo json_encode(array_values($savedViews ?? []), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
         nav:<?php echo json_encode($nav, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+        permissions: <?php echo json_encode($permissions, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
         legacyList: <?php echo json_encode($legacyList, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
     };
 </script>

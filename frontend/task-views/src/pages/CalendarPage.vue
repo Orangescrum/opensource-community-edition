@@ -1,15 +1,30 @@
+<script>
+import { ref as moduleRef } from "vue";
+
+/*
+ * App.vue swaps this page for "Loading tasks…" on every load, so any filter
+ * change remounts it. Kept outside setup so the open month and the date-only
+ * filters survive that — changing a filter in October used to land you back
+ * on the current month.
+ */
+const keptCursor = moduleRef(null);
+const keptMyDays = moduleRef(new Set());
+</script>
+
 <script setup>
 import { computed, ref } from "vue";
 import { useTaskStore } from "@/store/useTaskStore";
 import { formatDue, statusMeta } from "@/data/tasks";
 import { fetchWorkload } from "@/data/mutations";
+import { PRESETS } from "@/data/serverFilters";
 
 import { openTask } from "@/utils/taskLink";
 
 const store = useTaskStore();
 
-// Anchor month. `new Date()` at setup is fine — this is view state, not data.
-const cursor = ref(startOfMonth(new Date()));
+// Anchor month: view state, not data. Starts on the current month.
+const cursor = keptCursor;
+if (!cursor.value) cursor.value = startOfMonth(new Date());
 
 function startOfMonth(d) {
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -57,7 +72,9 @@ const cells = computed(() => {
             day: d.getDate(),
             inMonth: d.getMonth() === first.getMonth(),
             isToday: iso === todayIso,
-            tasks: byDate.value[iso] ?? [],
+            tasks: forDay(iso),
+            // Before the date-only filter, so the toggle stays on a day it emptied.
+            hasTasks: Boolean(byDate.value[iso]?.length),
         });
     }
     return out;
@@ -79,7 +96,7 @@ const dayOpen = computed({
     },
 });
 // Read live from byDate so the list follows a reschedule made meanwhile.
-const dayTasks = computed(() => (dayIso.value ? byDate.value[dayIso.value] ?? [] : []));
+const dayTasks = computed(() => (dayIso.value ? forDay(dayIso.value) : []));
 const dayDone = computed(() => dayTasks.value.filter((t) => t.status === "resolved" || t.status === "closed").length);
 
 /*
@@ -89,6 +106,109 @@ const dayDone = computed(() => dayTasks.value.filter((t) => t.status === "resolv
  */
 function openFromDay(task, event) {
     if (openTask(task, event)) dayIso.value = null;
+}
+
+/*
+ * My Task toggle. It is the "Assigned to me" preset — the same one the toolbar's
+ * preset menu and the command palette set — so it filters server-side, shows
+ * as a filter chip, is captured by saved views and is cleared by Reset like any
+ * other filter. One store state means every day's toggle, the grid and the
+ * Not scheduled list always agree.
+ */
+const MY_PRESET = "assigntome";
+const myTasksOn = computed(() => store.preset === MY_PRESET);
+
+/*
+ * Offered when narrowing to your own tasks would change something: you can see
+ * other people's tasks, or the list spans several people and you are one of
+ * them. Read from the loaded rows rather than `visible`, so a search or filter
+ * can't hide it — and kept while it is on, because then the rows are only
+ * yours and would otherwise take away the way back.
+ */
+const canViewAll = Boolean(window.TASK_VIEWS_CONFIG?.permissions?.viewAllTasks);
+const myToggleAvailable = computed(() => {
+    if (myTasksOn.value || myDays.value.size || canViewAll) return true;
+    const people = new Set(store.tasks.map((t) => t.assigneeId).filter(Boolean));
+    return people.size > 1 && store.tasks.some((t) => t.assignedToMe);
+});
+
+/*
+ * Dates narrowed to your tasks on their own, without the all-dates preset. This
+ * only hides rows on those days, so it is view state for this visit, like the
+ * open month: it is not sent to the server or saved in a view, and Reset or
+ * applying a saved view clears it along with the filters.
+ */
+const myDays = keptMyDays;
+store.$onAction(({ name }) => {
+    if (name === "clearFilters" || name === "applySavedView") myDays.value = new Set();
+});
+
+function setMyDay(iso, on) {
+    const next = new Set(myDays.value);
+    if (on) next.add(iso);
+    else next.delete(iso);
+    myDays.value = next;
+}
+
+/** A day's tasks, narrowed to yours when that date has its own My Task filter. */
+function forDay(iso) {
+    const tasks = byDate.value[iso] ?? [];
+    return myDays.value.has(iso) ? tasks.filter((t) => t.assignedToMe) : tasks;
+}
+
+/** "all" when the all-dates preset is on, "day" for a date-only filter, else null. */
+function myScope(iso) {
+    if (myTasksOn.value) return "all";
+    return myDays.value.has(iso) ? "day" : null;
+}
+
+/** The toggle change waiting on the user's choice — {iso, on, scope} — or null. */
+const myConfirm = ref(null);
+const myConfirmOpen = computed({
+    get: () => myConfirm.value !== null,
+    set: (open) => {
+        if (!open) myConfirm.value = null;
+    },
+});
+
+function myToggleLabel(iso) {
+    const scope = myScope(iso);
+    if (scope === "all") return "My Task on for all dates: showing only tasks assigned to you";
+    if (scope === "day") return `My Task on for ${longDate(iso)} only: showing only tasks assigned to you`;
+    return "My Task: show only tasks assigned to you";
+}
+
+/** Another preset gets replaced, since presets are one at a time. */
+const replacedPreset = computed(() =>
+    store.preset && store.preset !== MY_PRESET
+        ? PRESETS.find((p) => p.value === store.preset)?.label ?? null
+        : null
+);
+
+function askMyTasks(iso) {
+    const scope = myScope(iso);
+    myConfirm.value = { iso, on: !scope, scope };
+}
+
+/** This date only: narrow (or restore) just this day; nothing is refetched. */
+function confirmMyDay() {
+    const { iso, on } = myConfirm.value;
+    myConfirm.value = null;
+    setMyDay(iso, on);
+}
+
+/*
+ * Every date: the "Assigned to me" preset. setFilter rather than applyPreset:
+ * the preset implies no status, priority or due filter, so the others the user
+ * has set stay as they are. Date-only filters are dropped either way — on, the
+ * preset already covers them; off, "all dates" means all of them.
+ */
+function confirmMyAll() {
+    const on = myConfirm.value?.on;
+    myConfirm.value = null;
+    myDays.value = new Set();
+    if (on) store.setFilter("preset", MY_PRESET);
+    else if (myTasksOn.value) store.setFilter("preset", "");
 }
 
 /** Done reads as a tick, in progress as a filled dot, not started as an open circle. */
@@ -309,7 +429,21 @@ async function confirmReschedule() {
                 @click="createOn(cell, $event)"
             >
                 <div class="cal__head">
-                    <span class="cal__date">{{ cell.day }}</span>
+                    <span class="cal__day">
+                        <span class="cal__date">{{ cell.day }}</span>
+                        <button
+                            v-if="myToggleAvailable && cell.hasTasks && !dragging"
+                            type="button"
+                            class="cal__tool cal__mine"
+                            :class="{ 'is-on': myScope(cell.iso) }"
+                            :aria-pressed="myScope(cell.iso) ? 'true' : 'false'"
+                            :title="myToggleLabel(cell.iso)"
+                            :aria-label="myToggleLabel(cell.iso)"
+                            @click.stop="askMyTasks(cell.iso)"
+                        >
+                            <v-icon :icon="myScope(cell.iso) ? 'mdi-account-check' : 'mdi-account-check-outline'" size="14" />
+                        </button>
+                    </span>
                     <span v-if="!dragging" class="cal__tools">
                         <button
                             type="button"
@@ -413,6 +547,73 @@ async function confirmReschedule() {
                 </li>
             </ul>
         </div>
+
+        <v-dialog v-model="myConfirmOpen" max-width="440">
+            <div v-if="myConfirm" class="cal-dlg">
+                <div class="cal-dlg__head">
+                    <h2 class="cal-dlg__title">
+                        <template v-if="myConfirm.on">Show only your tasks?</template>
+                        <template v-else-if="myConfirm.scope === 'day'">Show everyone's tasks on {{ longDate(myConfirm.iso) }}?</template>
+                        <template v-else>Show everyone's tasks?</template>
+                    </h2>
+                    <button type="button" class="cal-dlg__close" aria-label="Close" title="Close" @click="myConfirm = null">
+                        <v-icon icon="mdi-close" size="16" />
+                    </button>
+                </div>
+
+                <!-- On: the user picks the scope. -->
+                <template v-if="myConfirm.on">
+                    <p class="cal-dlg__body cal-dlg__body--text">
+                        Show only tasks assigned to you on <strong>{{ longDate(myConfirm.iso) }}</strong> only,
+                        or on every date of the calendar and in Not scheduled.
+                    </p>
+                    <p class="cal-dlg__meta tv-meta">
+                        <template v-if="replacedPreset">“Apply to all dates” replaces the “{{ replacedPreset }}” preset; your other filters stay applied.</template>
+                        <template v-else>Your other filters stay applied.</template>
+                    </p>
+                    <div class="cal-dlg__actions">
+                        <button type="button" class="cal-btn" @click="confirmMyDay">This date only</button>
+                        <button type="button" class="cal-btn cal-btn--primary" @click="confirmMyAll">Apply to all dates</button>
+                    </div>
+                </template>
+
+                <!-- Off, from a date-only filter. -->
+                <template v-else-if="myConfirm.scope === 'day'">
+                    <p class="cal-dlg__body cal-dlg__body--text">
+                        <template v-if="myDays.size > 1">
+                            Remove the My Task filter from this date only, or from all {{ myDays.size }} dates that have it.
+                        </template>
+                        <template v-else>The My Task filter will be removed from this date.</template>
+                    </p>
+                    <div class="cal-dlg__actions">
+                        <button
+                            v-if="myDays.size > 1"
+                            type="button"
+                            class="cal-btn"
+                            @click="confirmMyAll"
+                        >
+                            Remove from all dates
+                        </button>
+                        <button type="button" class="cal-btn cal-btn--primary" @click="confirmMyDay">This date only</button>
+                    </div>
+                </template>
+
+                <!--
+                    Off, from the all-dates filter. Only your tasks were loaded,
+                    so one day can't show everyone's without the rest.
+                -->
+                <template v-else>
+                    <p class="cal-dlg__body cal-dlg__body--text">
+                        The My Task filter is on for every date, so it is removed from every date of the calendar and from Not scheduled, not just this day.
+                    </p>
+                    <p class="cal-dlg__meta tv-meta">Your other filters stay applied.</p>
+                    <div class="cal-dlg__actions">
+                        <button type="button" class="cal-btn" @click="myConfirm = null">Cancel</button>
+                        <button type="button" class="cal-btn cal-btn--primary" @click="confirmMyAll">Remove from all dates</button>
+                    </div>
+                </template>
+            </div>
+        </v-dialog>
 
         <v-dialog v-model="confirmOpen" max-width="440">
             <div v-if="pending" class="cal-dlg">
@@ -741,6 +942,72 @@ async function confirmReschedule() {
 .cal__add:focus-visible {
     opacity: 1;
     color: var(--tv-brand);
+}
+
+/* Day number with the My Task toggle beside it. */
+.cal__day {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Off: quiet like the +, until the day is hovered. On: filled brand chip on every day. */
+.cal__mine {
+    color: var(--tv-faint);
+    opacity: 0.55;
+    transition: opacity 80ms, color 80ms, background-color 80ms;
+}
+
+.cal__cell:hover .cal__mine,
+.cal__mine:focus-visible {
+    opacity: 1;
+    color: var(--tv-brand);
+}
+
+.cal__mine.is-on {
+    opacity: 1;
+    background: var(--tv-brand-soft);
+    color: var(--tv-brand);
+    box-shadow: inset 0 0 0 1px var(--tv-brand-ring);
+}
+
+.cal__mine.is-on:hover,
+.cal__mine.is-on:focus-visible {
+    background: var(--tv-brand-soft);
+    color: var(--tv-brand);
+}
+
+.cal-dlg__body--text {
+    display: block;
+    line-height: 1.5;
+}
+
+.cal-dlg__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cal-dlg__close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: 26px;
+    block-size: 26px;
+    margin: -4px -6px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--tv-radius);
+    background: none;
+    color: var(--tv-ink-2);
+    cursor: pointer;
+}
+
+.cal-dlg__close:hover,
+.cal-dlg__close:focus-visible {
+    background: var(--tv-sub);
+    color: var(--tv-ink);
 }
 
 .cal-day {
