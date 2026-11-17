@@ -28,7 +28,7 @@
 <script>
 $(function() {
     $("#end_date_mil").datepicker({
-        format: 'M d, yyyy',
+        format: CompanyDate.datepickerFormat(),
         changeMonth: false,
         changeYear: false,
         startDate: 0,
@@ -39,7 +39,7 @@ $(function() {
         $("#start_date_mil").datepicker("setEndDate", dateText);
     });
     $("#start_date_mil").datepicker({
-        format: 'M d, yyyy',
+        format: CompanyDate.datepickerFormat(),
         changeMonth: false,
         changeYear: false,
         startDate: 0,

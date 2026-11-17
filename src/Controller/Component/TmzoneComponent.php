@@ -23,6 +23,7 @@
 
 namespace App\Controller\Component;
 
+use App\Service\DateFormatService;
 use Cake\Controller\Component;
 use Cake\I18n\FrozenTime;
 
@@ -674,15 +675,16 @@ This may be added at a later date for better accuracy */
                 } else {
                     $CurYr = date('Y', strtotime($curdate));
                     $DateYr = date('Y', strtotime($dateformated));
+                    $dayTs = strtotime($dateformated);
                     if ($viewtype == 'kanban') {
-                        $dateformated = date('m/d', strtotime($dateformated));
+                        $dateformated = DateFormatService::formatDayMonth($dayTs);
                     } elseif ($CurYr == $DateYr) {
-                        $dateformated = date('M d', strtotime($dateformated));
-                        $dtformated = date('M d', strtotime($dateformated)) . ', ' . date('D', strtotime($dateformated));
+                        $dateformated = DateFormatService::formatDayMonth($dayTs);
+                        $dtformated = $dateformated . ', ' . date('D', $dayTs);
                         $displayWeek = 1;
                     } else {
-                        $dateformated = date('M d, Y', strtotime($dateformated));
-                        $dtformated = date('M d, Y', strtotime($dateformated));
+                        $dateformated = DateFormatService::format($dayTs);
+                        $dtformated = $dateformated;
                     }
                     $dateTime_Format = $dateformated;
                 }
@@ -707,7 +709,7 @@ This may be added at a later date for better accuracy */
                         }
                     } else {
                         if ($is_month_last) {
-                            return date('D', strtotime($dateformated)) . ', ' . $dateTime_Format;
+                            return date('D', $dayTs) . ', ' . $dateTime_Format;
                         } elseif ($viewtype == 'kanban') {
                             return $dateTime_Format . ', ' . ' ' . $timeformat;
                         } else {

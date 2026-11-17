@@ -387,7 +387,7 @@
             }
         });
         $("#logstrtdt").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             hideIfNoPrevNext: true,
@@ -397,7 +397,7 @@
             $("#logenddt").datepicker("setStartDate", dateText);
         });
         $("#logenddt").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             hideIfNoPrevNext: true,

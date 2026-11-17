@@ -27,6 +27,7 @@ namespace App\Controller\Component;
 
 use App\Model\Table\EasycasesTable;
 use App\Model\Table\ProjectsTable;
+use App\Service\DateFormatService;
 use App\Model\Table\TypesTable;
 use App\Model\Table\WorkHoursTable;
 use App\Utility\CommonUtility;
@@ -148,7 +149,7 @@ class FormatComponent extends Component
             if (in_array($val, $invd_dts)) {
                 return __('--');
             } else {
-                return date('M d, Y', strtotime($val));
+                return DateFormatService::format($val);
             }
         }
     }
@@ -2081,11 +2082,12 @@ class FormatComponent extends Component
                 } else {
                     $CurYr = date('Y', strtotime($curdate));
                     $DateYr = date('Y', strtotime($dateformated));
+                    $dayTs = strtotime($dateformated);
                     if ($CurYr == $DateYr) {
-                        $dateformated = date('m/d', strtotime($dateformated));
+                        $dateformated = DateFormatService::formatDayMonth($dayTs);
                         $displayWeek = 1;
                     } else {
-                        $dateformated = date('M d Y', strtotime($dateformated));
+                        $dateformated = DateFormatService::format($dayTs);
                     }
                     $dateTime_Format = $dateformated;
                 }
@@ -2098,13 +2100,13 @@ class FormatComponent extends Component
                     if ($dateTime_Format == 'Today' || $dateTime_Format == "Y'day" || !$displayWeek) {
                         return $dateTime_Format;
                     } else {
-                        return $dateTime_Format . ', ' . date('D', strtotime($dateformated));
+                        return $dateTime_Format . ', ' . date('D', $dayTs);
                     }
                 } else {
                     if ($dateTime_Format == 'Today' || $dateTime_Format == "Y'day") {
                         return $dateTime_Format . ' ' . $timeformat;
                     } else {
-                        return $dateTime_Format . ', ' . date('D', strtotime($dateformated)) . ' ' . $timeformat;
+                        return $dateTime_Format . ', ' . date('D', $dayTs) . ' ' . $timeformat;
                     }
                 }
             }
@@ -2121,7 +2123,7 @@ class FormatComponent extends Component
             $dateformated = $date_ex2[1] . '/' . $date_ex2[2] . '/' . $date_ex2[0];
             if ($date_ex2[2] != '00') {
                 $timeformat = date('g:i a', strtotime($date_time));
-                $dateformated = date('m/d/Y', strtotime($dateformated));
+                $dateformated = DateFormatService::format($dateformated);
                 $dateTime_Format = $dateformated;
 
                 if ($type == 'time') {

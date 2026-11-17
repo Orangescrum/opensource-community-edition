@@ -20,6 +20,7 @@ namespace App\Controller;
 
 use App\Model\Table\ProjectsTable;
 use App\Model\Table\RolesTable;
+use App\Service\DateFormatService;
 use App\Service\DefaultViewService;
 use App\Utility\CommonUtility;
 use Cake\Cache\Cache;
@@ -159,6 +160,7 @@ class AppController extends Controller
 
         if ($this->logged_user !== null) {
             $this->initLoggedinUser();
+            $this->normalizeCompanyDateInputs();
 
             $accessDetails = $this->roleAccessAllowed();
             if ($accessDetails['allowed'] == false) {
@@ -170,6 +172,28 @@ class AppController extends Controller
             }
         }
 
+    }
+
+    /**
+     * Date fields are shown in the company's date format, so a submitted value may
+     * be written that way (e.g. 17-11-2026). Convert those to Y-m-d here, once, so
+     * every action downstream sees the machine-readable form it already expects.
+     */
+    private function normalizeCompanyDateInputs(): void
+    {
+        if (!defined('SES_COMP') || (int)SES_COMP <= 0) {
+            return;
+        }
+        $companyId = (int)SES_COMP;
+        $body = $this->request->getParsedBody();
+        $query = $this->request->getQueryParams();
+
+        $request = $this->request
+            ->withQueryParams(DateFormatService::normalizeInputs($query, $companyId));
+        if (is_array($body)) {
+            $request = $request->withParsedBody(DateFormatService::normalizeInputs($body, $companyId));
+        }
+        $this->setRequest($request);
     }
 
     public function beforeRender(EventInterface $event)

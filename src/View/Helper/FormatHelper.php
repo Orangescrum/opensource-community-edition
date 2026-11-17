@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace App\View\Helper;
 
 use App\Model\Table\ProjectsTable;
+use App\Service\DateFormatService;
 use App\Utility\CommonUtility;
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
@@ -929,26 +930,32 @@ class FormatHelper extends Helper
      * used to format date only
      */
 
-    public function get_date($date = '', $format = 'M d, Y')
+    /**
+     * Date for display. Without $format, the company's configured date format is used.
+     */
+    public function get_date($date = '', $format = null)
     {
         if ($date == '') {
             $date = date('Y-m-d H:i:s');
         }
 
-        return date($format, strtotime($date));
+        return date($format ?? DateFormatService::phpPattern(), strtotime($date));
     }
 
     /* By GKM
      * used to format date and time
      */
 
-    public function get_date_time($date = '', $format = 'M d, Y h:i a')
+    /**
+     * Date and time for display. Without $format, the company's date format is used with h:i a.
+     */
+    public function get_date_time($date = '', $format = null)
     {
         if ($date == '') {
             $date = date('Y-m-d H:i:s');
         }
 
-        return date($format, strtotime($date));
+        return date($format ?? (DateFormatService::phpPattern() . ' h:i a'), strtotime($date));
     }
 
     /* By GKM
@@ -1283,26 +1290,16 @@ class FormatHelper extends Helper
         return $getWikiUsername['User']['name'] ?? '';
     }
 
+    /** Date for display in the company's format. */
     public function chngdate($lgdt)
     {
-        if ($GLOBALS['DateFormat'] == 2) {
-            $date_format = 'd M, Y';
-        } else {
-            $date_format = 'M d, Y';
-        }
-
-        return date($date_format, strtotime($lgdt));
+        return DateFormatService::format($lgdt);
     }
 
+    /** Same company format for CSV output; the date is presentation only. */
     public function chngdate_csv($lgdt)
     {
-        if ($GLOBALS['DateFormat'] == 2) {
-            $date_format = 'd M Y';
-        } else {
-            $date_format = 'M d Y';
-        }
-
-        return date($date_format, strtotime($lgdt));
+        return DateFormatService::format($lgdt);
     }
     /*
      * Check the resource availability On

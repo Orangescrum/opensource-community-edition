@@ -293,7 +293,7 @@
                 <script type="text/javascript">
                     $(function() {
                         $("#start_date").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,
@@ -304,7 +304,7 @@
                             $("#end_date").datepicker("setStartDate", dateText);
                         });
                         $("#end_date").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,
@@ -315,7 +315,7 @@
                             $("#start_date").datepicker("setEndDate", dateText);
                         });
                         $("#utilizationstrtdt").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,
@@ -326,7 +326,7 @@
                             $("#utilizationenddt").datepicker("setStartDate", dateText);
                         });
                         $("#utilizationenddt").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,
@@ -337,7 +337,7 @@
                             $("#utilizationstrtdt").datepicker("setEndDate", dateText);
                         });
                         $("#pendingstrtdt").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,
@@ -348,7 +348,7 @@
                             $("#pendingenddt").datepicker("setStartDate", dateText);
                         });
                         $("#pendingenddt").datepicker({
-                            format: 'M d, yyyy',
+                            format: CompanyDate.datepickerFormat(),
                             changeMonth: false,
                             changeYear: false,
                             startDate: 0,

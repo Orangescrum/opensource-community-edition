@@ -97,12 +97,18 @@ if (in_array($locale, ['ar', 'ara', 'he', 'fa', 'ur'])) {
     echo $this->Html->script($js_arr);
     echo $this->Html->script('moment.js?v=' . ASSET_RELEASE, ['defer']);
     echo $this->Html->script('datepicker/bootstrap-datepicker.min.js?v=' . ASSET_RELEASE, ['defer']);
+    // Deferred so it runs after the datepicker plugin above and before any page ready handler.
+    echo $this->Html->script('company-date-format.js?v=' . ASSET_RELEASE, ['defer']);
     echo $this->Html->script('angular.min.js?v=' . ASSET_RELEASE);
     echo $this->Html->script('angular-route.js?v=' . ASSET_RELEASE);
     echo $this->Html->script('angular-sanitize.js?v=' . ASSET_RELEASE, ['defer']);
     echo $this->Html->script('angular-animate.js?v=' . ASSET_RELEASE, ['defer']);
     echo $this->Html->script('jquery.bxslider.min.js?v=' . ASSET_RELEASE, ['defer']);
     echo $this->Html->script('axios.min.js?v=' . ASSET_RELEASE);
+    $companyDateFormatJson = json_encode(
+        \App\Service\DateFormatService::clientConfig(),
+        JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES
+    );
     // Prefer the CsrfProtectionMiddleware request attribute, which is always
     // populated for the current request. Reading the cookie alone was empty on
     // the very first page load of a new session (the cookie is only set on the
@@ -114,6 +120,7 @@ if (in_array($locale, ['ar', 'ara', 'he', 'fa', 'ur'])) {
 
     <script>
         const _csrfToken = '<?php echo $token; ?>';
+        window.COMPANY_DATE_FORMAT = <?php echo $companyDateFormatJson; ?>;
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-Token'] = _csrfToken;
         axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

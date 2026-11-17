@@ -489,7 +489,7 @@
 <script>
     $(function() {
         $("#edit_ProjStartDate").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             hideIfNoPrevNext: true,
@@ -498,7 +498,7 @@
             $("#edit_ProjEndDate").datepicker("setStartDate", $("#edit_ProjStartDate").datepicker('getFormattedDate'));
         });
         $("#edit_ProjEndDate").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             hideIfNoPrevNext: true,

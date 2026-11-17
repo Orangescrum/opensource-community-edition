@@ -4,6 +4,18 @@ const tz = config.tz || {}
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 /**
+ * Calendar date in the company's configured format (window.CompanyDate, see
+ * webroot/js/company-date-format.js). Falls back to "Mon D, YYYY" if the helper is absent.
+ */
+function formatCalendarDate(d) {
+  const y = d.getUTCFullYear()
+  const m = d.getUTCMonth()
+  const day = d.getUTCDate()
+  if (window.CompanyDate) return window.CompanyDate.formatParts(y, m, day)
+  return `${months[m]} ${day}, ${y}`
+}
+
+/**
  * Apply GMT offset to a UTC date string from the DB.
  */
 function applyTzOffset(dateStr) {
@@ -24,7 +36,7 @@ export function useFormatters() {
     if (!dateStr || dateStr === 'N/A') return 'N/A'
     const d = applyTzOffset(dateStr)
     if (!d || isNaN(d.getTime())) return dateStr
-    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
+    return formatCalendarDate(d)
   }
 
   /**
@@ -38,7 +50,7 @@ export function useFormatters() {
     const ampm = h >= 12 ? 'PM' : 'AM'
     h = h % 12 || 12
     const min = String(d.getUTCMinutes()).padStart(2, '0')
-    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()} ${h}:${min} ${ampm}`
+    return `${formatCalendarDate(d)} ${h}:${min} ${ampm}`
   }
 
   /**

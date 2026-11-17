@@ -23,6 +23,7 @@
 
 namespace App\View\Helper;
 
+use App\Service\DateFormatService;
 use Cake\View\Helper;
 use Cake\View\View;
 
@@ -117,7 +118,7 @@ class DatetimeHelper extends Helper
         } elseif ($duedate == $tomorrow) {
             return __('Tomorrow');
         } else {
-            return date('m/d/Y', strtotime($duedate));
+            return DateFormatService::format($duedate);
         }
     }
 
@@ -161,15 +162,16 @@ class DatetimeHelper extends Helper
                 } else {
                     $CurYr = date('Y', strtotime($curdate ?? ''));
                     $DateYr = date('Y', strtotime($dateformated ?? ''));
+                    $dayTs = strtotime($dateformated);
                     if ($viewtype == 'kanban') {
-                        $dateformated = date('m/d', strtotime($dateformated));
+                        $dateformated = DateFormatService::formatDayMonth($dayTs);
                     } elseif ($CurYr == $DateYr) {
-                        $dateformated = date('M d', strtotime($dateformated));
-                        $dtformated = date('M d', strtotime($dateformated)) . ', ' . date('D', strtotime($dateformated));
+                        $dateformated = DateFormatService::formatDayMonth($dayTs);
+                        $dtformated = $dateformated . ', ' . date('D', $dayTs);
                         $displayWeek = 1;
                     } else {
-                        $dateformated = date('M d, Y', strtotime($dateformated));
-                        $dtformated = date('M d, Y', strtotime($dateformated));
+                        $dateformated = DateFormatService::format($dayTs);
+                        $dtformated = $dateformated;
                     }
                     $dateTime_Format = $dateformated;
                 }
@@ -192,7 +194,7 @@ class DatetimeHelper extends Helper
                         }
                     } else {
                         if ($is_month_last) {
-                            return date('D', strtotime($dateformated)) . ', ' . $dateTime_Format;
+                            return date('D', $dayTs) . ', ' . $dateTime_Format;
                         } elseif ($viewtype == 'kanban') {
                             return $dateTime_Format . ', ' . ' ' . $timeformat;
                         } else {

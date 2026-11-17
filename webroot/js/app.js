@@ -1341,7 +1341,7 @@ caseapp.controller('taskController', function ($scope,$cacheFactory,$compile, $h
                 if (clkdDateExst) {
                     $("#workeddt1").val(formatDate('MMM DD, YYYY', clkdDateExst));
                     $("#workeddt1").datepicker({
-                        format: 'MMM DD, YYYY',
+                        format: CompanyDate.datepickerFormat(),
                         changeMonth: false,
                         changeYear: false,
                         hideIfNoPrevNext: true,
@@ -1350,7 +1350,7 @@ caseapp.controller('taskController', function ($scope,$cacheFactory,$compile, $h
                     $("#workeddt1").datepicker("update", new Date(clkdDateExst));
                 } else {
                     $("#workeddt1").datepicker({
-                        format: 'MMM DD, YYYY',
+                        format: CompanyDate.datepickerFormat(),
                         changeMonth: false,
                         changeYear: false,
                         hideIfNoPrevNext: true,
@@ -2149,7 +2149,7 @@ caseapp.directive('mydatepicker', function () {
             $(element).datepicker({
                 altField: "#CS_due_date",
                 showOn: "button",
-                format: 'mm/dd/yyyy',
+                format: CompanyDate.datepickerFormat(),
                 buttonImage: HTTP_ROOT + "img/images/calendar.png",
                 buttonStyle: "background:#FFF;",
                 changeMonth: false,
