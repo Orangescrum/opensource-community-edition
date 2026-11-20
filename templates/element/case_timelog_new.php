@@ -140,7 +140,7 @@ $('.timelog_filter_msg').html('<span class="tg_msg_pos">'+timelog_filter_msg+'</
             %>
             <tr class="timelog-hover-block" <% if(typeof getdata.Project.uniq_id != 'undefined'){ %>data-id="log_prjuid_<%= getdata.LogTime.log_id %>" data-puid="<%= getdata.Project.uniq_id %>" <% } %> data-id-tsht="log_tsht_<%= getdata.LogTime.log_id %>" data-tisht-pid="<%= puid_for_final %>">
             <td class="width-10-per">
-                <div><%= moment(getdata[0].start_datetime_v1).format('MMM DD, YYYY')%></div>
+                <div><%= moment(getdata[0].start_datetime_v1).format(CompanyDate.momentFormat())%></div>
             </td>
             <td class="width-10-per" >
                 <div id="log_usrNm_<%= getdata.LogTime.log_id %>"><%= getdata[0].user_name %></div>

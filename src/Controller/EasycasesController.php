@@ -2027,7 +2027,7 @@ class EasycasesController extends AppController
             } elseif ($dueDays === 1) {
                 $csDueDisplay = __('Tomorrow');
             } else {
-                $csDueDisplay = date('M j, Y', strtotime($caseDuDate));
+                $csDueDisplay = \App\Service\DateFormatService::format($caseDuDate);
             }
         }
         if ($caseDuDate && $caseDuDate != 'NULL' && $caseDuDate != '0000-00-00 00:00:00' && $caseDuDate != '' && $caseDuDate != '1970-01-01 00:00:00') {
@@ -4323,7 +4323,7 @@ class EasycasesController extends AppController
         }
         $due = $this->localDay($task['due_date']);
         if ($due && $date > $due) {
-            return __('This task is due on {0}; schedule it on or before its due date.', date('M j, Y', strtotime($due)));
+            return __('This task is due on {0}; schedule it on or before its due date.', \App\Service\DateFormatService::format($due));
         }
 
         return null;
@@ -4830,7 +4830,7 @@ class EasycasesController extends AppController
         if ($casedetails['due_date'] && CommonUtility::checkValidDate($casedetails['due_date'])) {
             $due_date = $tz->GetDateTime(SES_TIMEZONE, TZ_GMT, TZ_DST, TZ_CODE, $casedetails['due_date'], 'datetime');
             $casedetails['due_date'] = date('m/d/Y', strtotime($due_date));
-            $casedetails['formatted_due_date'] = date('M d , D', strtotime($due_date));
+            $casedetails['formatted_due_date'] = \App\Service\DateFormatService::format($due_date) . ' , ' . date('D', strtotime($due_date));
         } else {
             $casedetails['due_date'] = '';
         }
@@ -4839,7 +4839,7 @@ class EasycasesController extends AppController
             $start_date = $tz->GetDateTime(SES_TIMEZONE, TZ_GMT, TZ_DST, TZ_CODE, $casedetails['gantt_start_date'], 'datetime');
             $casedetails['gantt_start_date'] = date('Y-m-d H:i:s', strtotime($start_date));
             $casedetails['start_date'] = date('m/d/Y', strtotime($start_date));
-            $casedetails['formatted_start_date'] = date('M d , D', strtotime($start_date));
+            $casedetails['formatted_start_date'] = \App\Service\DateFormatService::format($start_date) . ' , ' . date('D', strtotime($start_date));
         } else {
             $casedetails['gantt_start_date'] = '';
         }

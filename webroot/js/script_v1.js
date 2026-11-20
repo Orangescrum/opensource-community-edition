@@ -3171,9 +3171,9 @@ function custom_date_field() {
     $('.custom_field_datpicker').each(function() {
         var raw = $.trim($(this).val());
         if (raw) {
-            var m = moment(raw, ['DD/MM/YYYY', 'MMM D, YYYY', 'YYYY-MM-DD', 'MM/DD/YYYY'], true);
+            var m = moment(raw, ['DD/MM/YYYY', CompanyDate.momentFormat(), 'YYYY-MM-DD', 'MM/DD/YYYY'], true);
             if (m.isValid()) {
-                $(this).val(m.format('MMM D, YYYY'));
+                $(this).val(m.format(CompanyDate.momentFormat()));
             }
         }
     });
@@ -4208,7 +4208,7 @@ function case_quick(easycase, obj) {
             if (easycase.due_date != '01/01/1970') {
                 localStorage.setItem("change_reason_duedt", easycase.due_date);
                 $('#CS_due_date').val(easycase.due_date);
-                $('#due_date').val(moment(easycase.due_date).format('MMM DD, YYYY'));
+                $('#due_date').val(moment(easycase.due_date).format(CompanyDate.momentFormat()));
                 $('#date_dd').val(easycase.formatted_due_date);
             } else {
                 $('#CS_due_date').val('');
@@ -4221,7 +4221,7 @@ function case_quick(easycase, obj) {
         if (easycase.gantt_start_date) {
             if (easycase.gantt_start_date != '01/01/1970') {
                 $('#CS_start_date').val(moment(easycase.start_date).format('MM/DD/YYYY'));
-                $('#start_date').val(moment(easycase.start_date).format('MMM DD, YYYY'));
+                $('#start_date').val(moment(easycase.start_date).format(CompanyDate.momentFormat()));
             } else {
                 $('#CS_start_date').val('');
                 $('#start_date').val('');
@@ -4247,7 +4247,7 @@ function case_quick(easycase, obj) {
         if (dateText) {
             if (dateText != '1970-01-01') {
                 $('#CS_start_date').val(moment(dateText, ['YYYY-MM-DD']).format('MM/DD/YYYY'));
-                $('#start_date').val(moment(dateText, ['YYYY-MM-DD']).format('MMM DD, YYYY'));
+                $('#start_date').val(moment(dateText, ['YYYY-MM-DD']).format(CompanyDate.momentFormat()));
             } else {
                 $('#CS_start_date').val('');
                 $('#start_date').val('');
@@ -11761,18 +11761,18 @@ function showRecurringTask(attrVal) {
         $('#recurring_task_block').show();
         var case_end_date = '';
         if ($("#CS_due_date").val() != '' && $("#CS_due_date").val() != 'No Due Date') {
-            case_end_date = moment($("#CS_due_date").val()).format('MMM DD, YYYY');
+            case_end_date = CompanyDate.parse($("#CS_due_date").val()).format(CompanyDate.momentFormat());
             $('#recurrence_start_date_formatted').val(case_end_date);
-            $('#recurrence_start_date').val(moment($("#CS_due_date").val()).format('YYYY-MM-DD'));
-            $('#CSrepeat_start_date').val(moment($("#CS_due_date").val()).format('YYYY-MM-DD'));
+            $('#recurrence_start_date').val(CompanyDate.parse($("#CS_due_date").val()).format('YYYY-MM-DD'));
+            $('#CSrepeat_start_date').val(CompanyDate.parse($("#CS_due_date").val()).format('YYYY-MM-DD'));
         } else if ($("#CS_start_date").val() != '' && $("#CS_start_date").val() != 'No Start Date') {
-            case_end_date = moment($("#CS_start_date").val()).format('MMM DD, YYYY');
+            case_end_date = CompanyDate.parse($("#CS_start_date").val()).format(CompanyDate.momentFormat());
             $('#recurrence_start_date_formatted').val(case_end_date);
-            $('#recurrence_start_date').val(moment($("#CS_start_date").val()).format('YYYY-MM-DD'));
-            $('#CSrepeat_start_date').val(moment($("#CS_start_date").val()).format('YYYY-MM-DD'));
+            $('#recurrence_start_date').val(CompanyDate.parse($("#CS_start_date").val()).format('YYYY-MM-DD'));
+            $('#CSrepeat_start_date').val(CompanyDate.parse($("#CS_start_date").val()).format('YYYY-MM-DD'));
         } else {
             var today = new Date();
-            case_end_date = moment(today).format('MMM DD, YYYY');
+            case_end_date = moment(today).format(CompanyDate.momentFormat());
             $('#recurrence_start_date_formatted').val(case_end_date);
             $('#recurrence_start_date').val(moment(today).format('YYYY-MM-DD'));
             $('#CSrepeat_start_date').val(moment(today).format('YYYY-MM-DD'));
@@ -11791,7 +11791,7 @@ function showRecurringTask(attrVal) {
             changeYear: false,
             startDate: '0d',
             hideIfNoPrevNext: true,
-            setDate: moment(case_end_date).format('MMM DD, YYYY'),
+            setDate: moment(case_end_date).format(CompanyDate.momentFormat()),
             autoclose: true
         }).on("changeDate", function () {
             var dateText = $("#recurrence_start_date_formatted").datepicker('getFormattedDate');
@@ -11880,18 +11880,18 @@ function showRecurringTask(attrVal) {
                     var RecurStartDate = res['recurringData'][0]['RecurringEasycase']['start_date'];
                     var RecurEndDate = res['recurringData'][0]['RecurringEasycase']['end_date'];
                     if (RecurStartDate) {
-                        $('#recurrence_start_date_formatted').val(moment(RecurStartDate).format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment(RecurStartDate).format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment(RecurStartDate).format('YYYY-MM-DD'));
                     } else {
-                        $('#recurrence_start_date_formatted').val(moment().format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment().format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment().format('YYYY-MM-DD'));
                     }
                     if (RecurEndDate) {
-                        $('#recurrence_end_date_formatted').val(moment(RecurEndDate).format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment(RecurEndDate).format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment(RecurEndDate).format('YYYY-MM-DD'));
                         $("#end_by").prop('checked', true);
                     } else {
-                        $('#recurrence_end_date_formatted').val(moment(RecurStartDate).add(10, 'days').format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment(RecurStartDate).add(10, 'days').format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment(RecurStartDate).add(10, 'days').format('YYYY-MM-DD'));
                     }
                     if (res['recurringData'][0]['RecurringEasycase']['occurrences'] > 0) {
@@ -11945,16 +11945,16 @@ function addTaskEvents(objid) {
             var case_end_date = '';
             if (hidden_val != '' && hidden_val != 'No Due Date') {
                 $('#start_datePicker').val(hidden_val);
-                $("#end_datePicker").val(moment(hidden_val).format('MMM DD, YYYY'));
+                $("#end_datePicker").val(moment(hidden_val).format(CompanyDate.momentFormat()));
             } else {
                 var today = new Date();
-                case_end_date = formatDate('MMM DD, YYYY', today);
+                case_end_date = formatDate(CompanyDate.momentFormat(), today);
                 $('#start_datePicker').val(case_end_date);
                 $("#end_datePicker").val(case_end_date);
             }
             $("#date_dd").html(hidden_val);
             $("#CS_due_date").val(hidden_val);
-            $("#CS_repeat_start_date").val(formatDate('MMM DD, YYYY', hidden_val));
+            $("#CS_repeat_start_date").val(formatDate(CompanyDate.momentFormat(), hidden_val));
             $("#start_datePicker").datepicker("setStartDate", case_end_date);
         } else if (path == "opt2") { } else if (path == "opt4") {
             $("#CS_milestone").val(getSelectedValue("opt4"));
@@ -12033,7 +12033,7 @@ function addTaskEvents(objid) {
             var dateText = $("#start_date").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_start_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#start_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#start_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#end_datePicker").datepicker("setStartDate", dateText);
                 $("#due_date").datepicker("setStartDate", dateText);
             }
@@ -12041,7 +12041,7 @@ function addTaskEvents(objid) {
             var dateText = $("#due_date").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_due_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#end_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#end_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#start_datePicker").datepicker("setEndDate", dateText);
                 $("#start_date").datepicker("setEndDate", dateText);
             }
@@ -12049,14 +12049,14 @@ function addTaskEvents(objid) {
     }).on("hide", function (ev) {
         if ($(ev.target).attr('id') == 'start_date') {
             if ($('#start_date').val() == '') {
-                if (moment($('#CS_start_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#start_date').val(moment($('#CS_start_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#start_date').val(CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         } else {
             if ($('#due_date').val() == '') {
-                if (moment($('#CS_due_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#due_date').val(moment($('#CS_due_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#due_date').val(CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         }
@@ -12074,7 +12074,7 @@ function addTaskEvents(objid) {
             var dateText = $("#start_date_epic").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_start_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#start_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#start_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#end_datePicker").datepicker("setStartDate", dateText);
                 $("#due_date_epic").datepicker("setStartDate", dateText);
             }
@@ -12082,7 +12082,7 @@ function addTaskEvents(objid) {
             var dateText = $("#due_date_epic").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_due_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#end_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#end_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#start_datePicker").datepicker("setEndDate", dateText);
                 $("#start_date_epic").datepicker("setEndDate", dateText);
             }
@@ -12090,14 +12090,14 @@ function addTaskEvents(objid) {
     }).on("hide", function (ev) {
         if ($(ev.target).attr('id') == 'start_date_epic') {
             if ($('#start_date_epic').val() == '') {
-                if (moment($('#CS_start_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#start_date_epic').val(moment($('#CS_start_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#start_date_epic').val(CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         } else {
             if ($('#due_date_epic').val() == '') {
-                if (moment($('#CS_due_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#due_date_epic').val(moment($('#CS_due_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#due_date_epic').val(CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         }
@@ -12115,7 +12115,7 @@ function addTaskEvents(objid) {
             var dateText = $("#start_date_feature").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_start_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#start_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#start_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#end_datePicker").datepicker("setStartDate", dateText);
                 $("#due_date_feature").datepicker("setStartDate", dateText);
             }
@@ -12123,7 +12123,7 @@ function addTaskEvents(objid) {
             var dateText = $("#due_date_feature").datepicker('getFormattedDate');
             if (dateText != 'Invalid date') {
                 $("#CS_due_date").val(moment(dateText).format('YYYY-MM-DD'));
-                $("#end_datePicker").val(moment(dateText).format('MMM DD, YYYY'));
+                $("#end_datePicker").val(moment(dateText).format(CompanyDate.momentFormat()));
                 $("#start_datePicker").datepicker("setEndDate", dateText);
                 $("#start_date_feature").datepicker("setEndDate", dateText);
             }
@@ -12131,14 +12131,14 @@ function addTaskEvents(objid) {
     }).on("hide", function (ev) {
         if ($(ev.target).attr('id') == 'start_date_feature') {
             if ($('#start_date_feature').val() == '') {
-                if (moment($('#CS_start_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#start_date_feature').val(moment($('#CS_start_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#start_date_feature').val(CompanyDate.parse($('#CS_start_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         } else {
             if ($('#due_date_feature').val() == '') {
-                if (moment($('#CS_due_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#due_date_feature').val(moment($('#CS_due_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#due_date_feature').val(CompanyDate.parse($('#CS_due_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         }
@@ -16220,9 +16220,9 @@ function createlog(casesid) {
             $(".slct_task >span").html(_("Select The Task To Log Time"));
             $(".slct_task >span").removeClass('not_empty');
             if (clkdDateExst) {
-                $("#workeddt1").val(formatDate('MMM DD, YYYY', clkdDateExst));
+                $("#workeddt1").val(formatDate(CompanyDate.momentFormat(), clkdDateExst));
                 $("#workeddt1").datepicker({
-                    format: 'MMM DD, YYYY',
+                    format: CompanyDate.momentFormat(),
                     todayHighlight: true,
                     changeMonth: false,
                     changeYear: false,
@@ -16233,7 +16233,7 @@ function createlog(casesid) {
                 redirectToTimelogList = 0;
             } else {
                 $("#workeddt1").datepicker({
-                    format: 'MMM DD, YYYY',
+                    format: CompanyDate.momentFormat(),
                     todayHighlight: true,
                     changeMonth: false,
                     changeYear: false,
@@ -19906,12 +19906,12 @@ function setStartDueDt() {
         arr = $("#estimated_hours").val().split(":");
         tothr = parseInt(arr[0]);
         totday = Math.ceil(tothr / COMPANY_WORK_HOUR);
-        var wdate = addWeekdays(moment($("#start_date").val()), totday - 1);
-        $('#due_date').val(moment(wdate).format('MMM DD, YYYY'));
+        var wdate = addWeekdays(CompanyDate.parse($("#start_date").val()), totday - 1);
+        $('#due_date').val(moment(wdate).format(CompanyDate.momentFormat()));
         $('#CS_due_date').val(moment(wdate).format('YYYY-MM-DD'));
     }
     if ($("#estimated_hours").val().trim() != "" && $("#estimated_hours").val().trim() != "0:00" && $("#estimated_hours").val().trim() != "00:00" && ($("#due_date").val() != "" || $("#due_date").val().trim() == 'Invalid date') && ($("#start_date").val().trim() == "" || $("#start_date").val().trim() == 'Invalid date')) {
-        $('#start_date').val(moment().format('MMM DD, YYYY'));
+        $('#start_date').val(moment().format(CompanyDate.momentFormat()));
         $("#CS_start_date").val(moment().format('YYYY-MM-DD'));
     }
     if (PAGE_NAME == 'resourceAvailability' || (CONTROLLER == 'resourceavailabilitynew' && PAGE_NAME == 'index')) {
@@ -19923,12 +19923,12 @@ function setStartDueDt() {
             arr = $("#estimated_hours").val().split(":");
             tothr = parseInt(arr[0]);
             totday = Math.ceil(tothr / COMPANY_WORK_HOUR);
-            var wdate = addWeekdays(moment($("#start_date").val()), totday - 1);
-            $('#due_date').val(moment(wdate).format('MMM DD, YYYY'));
+            var wdate = addWeekdays(CompanyDate.parse($("#start_date").val()), totday - 1);
+            $('#due_date').val(moment(wdate).format(CompanyDate.momentFormat()));
             $('#CS_due_date').val(moment(wdate).format('YYYY-MM-DD'));
         }
         if ($("#estimated_hours").val().trim() != "" && $("#estimated_hours").val().trim() != "0:00" && $("#estimated_hours").val().trim() != "00:00" && ($("#due_date").val() != "" || $("#due_date").val().trim() == 'Invalid date') && ($("#start_date").val().trim() == "" || $("#start_date").val().trim() == 'Invalid date')) {
-            $('#start_date').val(moment().format('MMM DD, YYYY'));
+            $('#start_date').val(moment().format(CompanyDate.momentFormat()));
             $("#CS_start_date").val(moment().format('YYYY-MM-DD'));
         }
     }
@@ -20998,14 +20998,14 @@ function addSubtaskPopup(project_uniq_id, task_id, proj_id, casuid, title, task_
     }).on("hide", function (ev) {
         if ($(ev.target).attr('id') == 'sub_start_date') {
             if ($('#sub_start_date').val() == '') {
-                if (moment($('#CS_sub_start_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#sub_start_date').val(moment($('#CS_sub_start_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_sub_start_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#sub_start_date').val(CompanyDate.parse($('#CS_sub_start_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         } else {
             if ($('#sub_due_date').val() == '') {
-                if (moment($('#CS_sub_due_date').val()).format('MMM DD, YYYY') != 'Invalid date') {
-                    $('#sub_due_date').val(moment($('#CS_sub_due_date').val()).format('MMM DD, YYYY'));
+                if (CompanyDate.parse($('#CS_sub_due_date').val()).format(CompanyDate.momentFormat()) != 'Invalid date') {
+                    $('#sub_due_date').val(CompanyDate.parse($('#CS_sub_due_date').val()).format(CompanyDate.momentFormat()));
                 }
             }
         }
@@ -21127,12 +21127,12 @@ function setSubStartDueDt() {
         arr = $("#sub_estimated_hours").val().split(":");
         tothr = parseInt(arr[0]);
         totday = Math.ceil(tothr / COMPANY_WORK_HOUR);
-        var wdate = addWeekdays(moment($("#sub_start_date").val()), totday - 1);
-        $('#sub_due_date').val(moment(wdate).format('MMM DD, YYYY'));
+        var wdate = addWeekdays(CompanyDate.parse($("#sub_start_date").val()), totday - 1);
+        $('#sub_due_date').val(moment(wdate).format(CompanyDate.momentFormat()));
         $('#CS_sub_due_date').val(moment(wdate).format('YYYY-MM-DD'));
     }
     if ($("#sub_estimated_hours").val().trim() != "" && $("#sub_estimated_hours").val().trim() != "0:00" && $("#sub_estimated_hours").val().trim() != "00:00" && ($("#sub_due_date").val() != "" || $("#sub_due_date").val().trim() == 'Invalid date') && ($("#sub_start_date").val().trim() == "" || $("#sub_start_date").val().trim() == 'Invalid date')) {
-        $('#sub_start_date').val(moment().format('MMM DD, YYYY'));
+        $('#sub_start_date').val(moment().format(CompanyDate.momentFormat()));
         $("#CS_sub_start_date").val(moment().format('YYYY-MM-DD'));
     }
 }
@@ -21335,14 +21335,14 @@ function setDurations(duration, type) {
     var end_date = '';
     var start_date_obj = '';
     if (start_date == '' || start_date == 'Invalid date') {
-        start_date_obj = moment(new Date(moment().format('MMM DD, YYYY')));
+        start_date_obj = moment(new Date(moment().format(CompanyDate.momentFormat())));
         if (start_date_obj.format('dddd') != 'Saturday' && start_date_obj.format('dddd') != 'Sunday') {
-            start_date = start_date_obj.format('MMM DD, YYYY');
+            start_date = start_date_obj.format(CompanyDate.momentFormat());
         } else {
             if (start_date_obj.format('dddd') != 'Saturday') {
-                start_date = start_date_obj.add(2, 'day').format('MMM DD, YYYY');
+                start_date = start_date_obj.add(2, 'day').format(CompanyDate.momentFormat());
             } else {
-                start_date = start_date_obj.add(1, 'day').format('MMM DD, YYYY');
+                start_date = start_date_obj.add(1, 'day').format(CompanyDate.momentFormat());
             }
         }
         start_date_obj = moment(new Date(start_date));
@@ -21357,7 +21357,7 @@ function setDurations(duration, type) {
         b = start_date_obj.add(i, 'day').format('dddd');
         if (b != 'Saturday' && b != 'Sunday') {
             j++;
-            end_date = start_date_obj.format('MMM DD, YYYY');
+            end_date = start_date_obj.format(CompanyDate.momentFormat());
         }
         start_date_obj = moment(new Date(start_date));
     }

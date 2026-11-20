@@ -107,7 +107,7 @@
 						</td>
 						
 						<td class="assigned_user"><%= getdata.Assigned %></td>
-						<td class="due"><%= getdata.due_date!="" ? formatDate('MMM DD, YYYY',getdata.due_date) : "---" %></td>
+						<td class="due"><%= getdata.due_date!="" ? formatDate(CompanyDate.momentFormat(),getdata.due_date) : "---" %></td>
 						<td class="actions">
 							<div class="check-drop-icon fl">
 								<div class="dropdown">

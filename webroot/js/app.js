@@ -1339,7 +1339,7 @@ caseapp.controller('taskController', function ($scope,$cacheFactory,$compile, $h
                 $('#lgtimebtn').removeClass('loginactive');
                 $(".slct_task >span").html(_("Select Task"));
                 if (clkdDateExst) {
-                    $("#workeddt1").val(formatDate('MMM DD, YYYY', clkdDateExst));
+                    $("#workeddt1").val(formatDate(CompanyDate.momentFormat(), clkdDateExst));
                     $("#workeddt1").datepicker({
                         format: CompanyDate.datepickerFormat(),
                         changeMonth: false,

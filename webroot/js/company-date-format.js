@@ -61,6 +61,25 @@
         /** Format string for bootstrap-datepicker, e.g. "dd-mm-yyyy". */
         datepickerFormat: function () {
             return config().datepicker;
+        },
+        /**
+         * Format string for moment().format(), e.g. "DD-MMM-YYYY". The configured
+         * names are already moment tokens, so this is the name itself.
+         */
+        momentFormat: function () {
+            return config().name;
+        },
+        /**
+         * Reads a date typed into or written by a date field. Tries the company
+         * format first, then ISO and the older display formats, so values from
+         * before the setting existed still parse. Returns an invalid moment when
+         * nothing matches, which callers already check for.
+         */
+        parse: function (value) {
+            var v = String(value == null ? '' : value).trim();
+            var formats = [config().name, 'YYYY-MM-DD', 'YYYY-MM-DD HH:mm:ss', 'MMM DD, YYYY', 'MMM D, YYYY', 'DD-MM-YYYY', 'MM-DD-YYYY', 'DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD', 'DD-MMM-YYYY'];
+            var m = moment(v, formats, true);
+            return m.isValid() ? m : moment(v);
         }
     };
 

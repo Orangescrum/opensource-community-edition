@@ -232,28 +232,28 @@ $currentWeekOfMonth = $this->Format->weekOfMonth(strtotime(date('Y-m-d')));
                 $('#' + id + '_details').find('input[type="radio"]:first').prop('checked', true);
                 switch (id) {
                     case 'daily':
-                        $('#recurrence_start_date_formatted').val(moment().format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment().format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment().format('YYYY-MM-DD'));
-                        $('#recurrence_end_date_formatted').val(moment().add(10, 'days').format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment().add(10, 'days').format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment().add(10, 'days').format('YYYY-MM-DD'));
                         break;
                     case 'weekly':
                         var daysToAdd = <?php echo $currentDay; ?>;
-                        $('#recurrence_start_date_formatted').val(moment().startOf('week').add(daysToAdd, 'days').format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment().startOf('week').add(daysToAdd, 'days').format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment().startOf('week').add(daysToAdd, 'days').format('YYYY-MM-DD'));
-                        $('#recurrence_end_date_formatted').val(moment().startOf('week').add(daysToAdd, 'days').add(70, 'days').format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment().startOf('week').add(daysToAdd, 'days').add(70, 'days').format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment().startOf('week').add(daysToAdd, 'days').add(70, 'days').format('YYYY-MM-DD'));
                         break;
                     case 'monthly':
-                        $('#recurrence_start_date_formatted').val(moment().format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment().format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment().format('YYYY-MM-DD'));
-                        $('#recurrence_end_date_formatted').val(moment().add(10, 'months').format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment().add(10, 'months').format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment().add(10, 'months').format('YYYY-MM-DD'));
                         break;
                     case 'yearly':
-                        $('#recurrence_start_date_formatted').val(moment().format('MMM DD, YYYY'));
+                        $('#recurrence_start_date_formatted').val(moment().format(CompanyDate.momentFormat()));
                         $('#recurrence_start_date').val(moment().format('YYYY-MM-DD'));
-                        $('#recurrence_end_date_formatted').val(moment().add(10, 'years').format('MMM DD, YYYY'));
+                        $('#recurrence_end_date_formatted').val(moment().add(10, 'years').format(CompanyDate.momentFormat()));
                         $('#recurrence_end_date').val(moment().add(10, 'years').format('YYYY-MM-DD'));
                         break;
                 }
@@ -264,9 +264,9 @@ $currentWeekOfMonth = $this->Format->weekOfMonth(strtotime(date('Y-m-d')));
             $('#daily_details').show();
             $('#daily_details').find('input[type="radio"]:first').prop('checked', true);
             $('.recurrence-range-body-main-panel').find('input[type="radio"]:first').prop('checked', true);
-            $('#recurrence_start_date_formatted').val(moment(new Date(), 'YYYY-MM-DD').format('MMM DD, YYYY'));
+            $('#recurrence_start_date_formatted').val(moment(new Date(), 'YYYY-MM-DD').format(CompanyDate.momentFormat()));
             $('#recurrence_start_date').val(moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'));
-            $('#recurrence_end_date_formatted').val(moment(new Date(), 'YYYY-MM-DD').add(10, 'days').format('MMM DD, YYYY'));
+            $('#recurrence_end_date_formatted').val(moment(new Date(), 'YYYY-MM-DD').add(10, 'days').format(CompanyDate.momentFormat()));
             $('#recurrence_end_date').val(moment(new Date(), 'YYYY-MM-DD').add(10, 'days').format('YYYY-MM-DD'));
         }
     }

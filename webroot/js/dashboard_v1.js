@@ -13737,10 +13737,10 @@ function openTimesheetExportPopup(userid, startdate, enddate) {
     $(".exp_timesheet_popup").show();
     $(".loader_bg_inline_expt").show();
     if (startdate != "" && typeof startdate != "undefined") {
-        $("#expt_startDate").val(moment(startdate).format('MMM DD, YYYY'));
+        $("#expt_startDate").val(moment(startdate).format(CompanyDate.momentFormat()));
     }
     if (enddate != "" && typeof enddate != "undefined") {
-        $("#expt_endDate").val(moment(enddate).format('MMM DD, YYYY'));
+        $("#expt_endDate").val(moment(enddate).format(CompanyDate.momentFormat()));
     }
     $.post(HTTP_ROOT + 'LogTimes/getAllUsersProjects/', {}, function (res) {
         $(".loader_bg_inline_expt").hide();
