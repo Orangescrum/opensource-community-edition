@@ -167,7 +167,7 @@
                     <%= (username) ? username.trim().split(/\s+/)[0] : '<?php echo __('unassigned'); ?>' %>
                 </div>
             </td>
-            <td class="width-15-per"><%= getdata.due_date!="" ? formatDate('MMM DD, YYYY',getdata.due_date) : "---" %></td>
+            <td class="width-15-per"><%= getdata.due_date!="" ? formatDate(CompanyDate.momentFormat(),getdata.due_date) : "---" %></td>
             <td class="width-5-per">
                 <% if(SES_TYPE == 1 || SES_TYPE == 2 || (SES_ID == caseUserId) || isAllowed('Delete All Task',projectUniqid)) { caseFlag = "delete"; }
                 if(getdata.isactive == 1){ %>

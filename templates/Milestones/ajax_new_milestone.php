@@ -104,7 +104,7 @@
 <script>
     $(function() {
         $("#end_date_mil").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             todayHighlight: true,
             changeMonth: false,
             changeYear: false,
@@ -116,7 +116,7 @@
             $("#start_date_mil").datepicker("setEndDate", dateText);
         });
         $("#start_date_mil").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             todayHighlight: true,
             changeMonth: false,
             changeYear: false,

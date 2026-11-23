@@ -683,17 +683,17 @@ use Cake\Core\Configure;
                 });
         $('#err_msg').html('');
         $("#txt_ProjStartDate").datepicker({
-            format: 'M d, yyyy', todayHighlight: true, changeMonth: false, changeYear: false, hideIfNoPrevNext: true, autoclose: true
+            format: CompanyDate.datepickerFormat(), todayHighlight: true, changeMonth: false, changeYear: false, hideIfNoPrevNext: true, autoclose: true
         }).on('changeDate', function (e) {
             $("#txt_ProjEndDate").datepicker("setStartDate", $("#txt_ProjStartDate").datepicker('getFormattedDate'));
         });
 
         $("#txt_ProjEndDate").datepicker({
-            format: 'M d, yyyy', todayHighlight: true, changeMonth: false, changeYear: false, hideIfNoPrevNext: true, autoclose: true
+            format: CompanyDate.datepickerFormat(), todayHighlight: true, changeMonth: false, changeYear: false, hideIfNoPrevNext: true, autoclose: true
         }).on('changeDate', function (e) {
             $("#txt_ProjStartDate").datepicker("setEndDate", $("#txt_ProjEndDate").datepicker('getFormattedDate'));
         });
-        // $(".input-daterange").datepicker({format: 'M d, yyyy',hideIfNoPrevNext: true,todayBtn: "linked",todayHighlight: true,autoclose: true});
+        // $(".input-daterange").datepicker({format: CompanyDate.datepickerFormat(),hideIfNoPrevNext: true,todayBtn: "linked",todayHighlight: true,autoclose: true});
 
         $('#members_list').on('keyup', function () {
             var aval = $(this).val().trim();

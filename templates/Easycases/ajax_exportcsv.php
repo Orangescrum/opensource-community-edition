@@ -186,7 +186,7 @@ echo $this->Form->create(null , array('name' => 'taskcsvForm', 'id' => 'taskcsvF
 <script>
     $(function() {
         $("#cst_to").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             startDate: 0,
@@ -197,7 +197,7 @@ echo $this->Form->create(null , array('name' => 'taskcsvForm', 'id' => 'taskcsvF
             $("#cst_frm").datepicker("setEndDate", dateText);
         });
         $("#cst_frm").datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             changeMonth: false,
             changeYear: false,
             startDate: 0,

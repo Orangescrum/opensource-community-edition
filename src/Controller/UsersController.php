@@ -5003,6 +5003,11 @@ class UsersController extends AppController
         $Company = $this->fetchTable('Companies');
         $getCompany = $Company->find()->where(['id' => SES_COMP])->disableHydration()->first();
         $this->set('getCompany', $getCompany);
+        // Owners (1) and admins (2) manage company-wide settings, as in saveDefaultView's peers.
+        $canEditDateFormat = in_array((int)SES_TYPE, [1, 2], true);
+        $this->set('canEditDateFormat', $canEditDateFormat);
+        $this->set('dateFormatOptions', \App\Service\DateFormatService::options());
+        $this->set('currentDateFormat', \App\Service\DateFormatService::getCompanyFormat(SES_COMP));
 
         if ($this->request->isPost()) {
             $defaults = ['name' => '', 'api_access_code' => '', 'website' => '', 'contact_phone' => '', 'currency_id' => '', 'exst_logo' => '', 'changepass' => '0', 'logo' => null];
@@ -5023,6 +5028,17 @@ class UsersController extends AppController
                 unset($data['changepass']);
 
                 $company = $Company->updateAll($data, ['id' => SES_COMP]);
+
+                // Only owners and admins may change the date format; anything else
+                // posted is ignored, and an unknown value is rejected.
+                $dateFormat = (string)$this->request->getData('date_format', '');
+                if ($canEditDateFormat && $dateFormat !== '') {
+                    if (!\App\Service\DateFormatService::setCompanyFormat((int)SES_COMP, $dateFormat)) {
+                        $this->getRequest()->getSession()->write('ERROR', __('Invalid date format'));
+                        return $this->redirect(HTTP_ROOT . 'users/mycompany');
+                    }
+                }
+
                 if (!$company) {
                     $this->getRequest()->getSession()->write('ERROR', __('Invalid company name'));
                 } else {

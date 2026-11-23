@@ -81,6 +81,15 @@ export function formatDue(iso) {
     if (days === 0) return "Today";
     if (days === -1) return "Y'day";
     if (days === 1) return "Tomorrow";
+    return calendarDate(d);
+}
+
+/**
+ * Absolute date in the company's configured format (window.CompanyDate, set by the
+ * layout from DateFormatService). Falls back to the browser locale if it is absent.
+ */
+export function calendarDate(d) {
+    if (window.CompanyDate) return window.CompanyDate.formatParts(d.getFullYear(), d.getMonth(), d.getDate());
     return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 }
 

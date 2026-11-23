@@ -103,6 +103,23 @@
                     <?= $this->Form->control('currency_id', [ 'name' => 'currency_id', 'options' => $this->Format->currency_opts(1), 'empty' => false, 'class' => 'form-control', 'id' => 'currency_id', 'placeholder' => __("Currency"), 'default' => $getCompany['currency_id'] ]); ?>
                     </div>
                 </div>
+                <div class="mtop20" style="margin-bottom:20px;">
+                    <div class="select_wrapper company-date-format">
+                        <?php /* Presentation only: stored dates and parsed input are unaffected. */ ?>
+                        <?= $this->Form->control('date_format', [
+                            'name' => 'date_format',
+                            'type' => 'select',
+                            'label' => __('Date Format'),
+                            'options' => $dateFormatOptions,
+                            'empty' => false,
+                            'class' => 'form-control',
+                            'id' => 'date_format',
+                            'default' => $currentDateFormat,
+                            'disabled' => !$canEditDateFormat,
+                            'title' => $canEditDateFormat ? '' : __('Only the company owner or admin can change the date format'),
+                        ]); ?>
+                    </div>
+                </div>
                 <div class="mtop20 hide">
                     <div class="form-group form-group-lg label-floating company-logo">
                         <label class="control-label" for="contact_phone"><?php echo __('Logo'); ?></label>

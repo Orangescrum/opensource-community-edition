@@ -606,7 +606,7 @@
             //$("#tsksid").attr('disabled',true);
         }
         $("#workeddt"+cntr).datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             todayHighlight: true,
             changeMonth: false,
             changeYear: false,
@@ -1166,15 +1166,14 @@
         }
         $("#crsid"+cntr).attr('onclick','removeUI('+cntr+');')
         $("#workeddt"+cntr).datepicker({
-            format: 'M d, yyyy',
+            format: CompanyDate.datepickerFormat(),
             todayHighlight: true,
             changeMonth: false,
             changeYear: false,
             hideIfNoPrevNext: true,
             autoclose: true
         });
-        $("#workeddt"+cntr).datepicker("setDate", moment(new Date()).format('MMM DD, YYYY'));
-        $("#workeddt"+cntr).val(moment(new Date()).format('MMM DD, YYYY'));
+        $("#workeddt"+cntr).datepicker("setDate", new Date());
         $("#tsmn"+cntr).val("00:30");
         $("#is_billable"+cntr).val(cntr);
         var d= new Date();

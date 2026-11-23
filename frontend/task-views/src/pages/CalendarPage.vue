@@ -14,7 +14,7 @@ const keptMyDays = moduleRef(new Set());
 <script setup>
 import { computed, ref } from "vue";
 import { useTaskStore } from "@/store/useTaskStore";
-import { formatDue, statusMeta } from "@/data/tasks";
+import { calendarDate, formatDue, statusMeta } from "@/data/tasks";
 import { fetchWorkload } from "@/data/mutations";
 import { PRESETS } from "@/data/serverFilters";
 
@@ -255,7 +255,7 @@ function initials(t) {
 function openCreate(iso) {
     if (typeof window.creatask !== "function") return;
     const d = new Date(`${iso}T00:00:00`);
-    const text = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const text = calendarDate(d);
     window.creatask("", "", "", "", text);
 }
 
